@@ -15,25 +15,21 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <section class="testimonial">
+    <section id="main-container" class="testimonial">
       <h2 class="testimonial__title">MENU</h2>
+
+      <!-- Category buttons -->
+      <div class="menu__categories"></div>
+
+      <!-- Swiper -->
       <div class="testimonial__swiper container swiper">
-        <div class="swiper-wrapper" id="menu-wrapper">
-          <!-- JS-ээр динамик card үүснэ -->
-        </div>
-
-        <!-- pagination -->
+        <div class="swiper-wrapper" id="menu-wrapper"></div>
         <div class="swiper-pagination"></div>
-
-        <!-- navigation buttons -->
-        <div class="swiper-button-prev"><i class="ri-arrow-left-line"></i></div>
-        <div class="swiper-button-next">
-          <i class="ri-arrow-right-line"></i>
-        </div>
       </div>
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
