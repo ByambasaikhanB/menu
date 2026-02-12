@@ -12,7 +12,7 @@ const swiperTestimonial = new Swiper(".testimonial__swiper", {
   autoplay: { delay: 99999, disableOnInteraction: false },
 });
 
-// Generate category buttons dynamically
+// Categories
 const categories = [
   "all",
   "lunch",
@@ -33,8 +33,9 @@ categories.forEach((cat) => {
   catWrapper.appendChild(btn);
 });
 
-// Render cards function
+// Render cards
 const wrapper = document.getElementById("menu-wrapper");
+
 function renderCards(category = "all") {
   wrapper.innerHTML = "";
   const filtered =
@@ -45,20 +46,32 @@ function renderCards(category = "all") {
   filtered.forEach((item) => {
     const card = document.createElement("article");
     card.classList.add("testimonial__card", "swiper-slide");
+
+    // Stars
+    let starsHTML = "";
+    for (let i = 1; i <= 5; i++) {
+      if (i <= item.rating) {
+        starsHTML += '<i class="ri-star-fill filled"></i>';
+      } else {
+        starsHTML += '<i class="ri-star-fill"></i>';
+      }
+    }
+
     card.innerHTML = `
       <img src="${item.image}" alt="${item.name}" class="testimonial__img" />
       <h3 class="testimonial__name">${item.name}</h3>
       <div class="testimonial__rating">
-        <div class="testimonial__stars">${'<i class="ri-star-fill"></i>'.repeat(item.rating)}</div>
+        <div class="testimonial__stars">${starsHTML}</div>
         <h3 class="testimonial__number">${item.rating.toFixed(1)}</h3>
       </div>
       <p class="testimonial__description">${item.description}</p>
       <h1>Price ${item.price}₮</h1>
     `;
+
     wrapper.appendChild(card);
   });
 
-  swiperTestimonial.update(); // refresh swiper
+  swiperTestimonial.update();
 }
 
 // Initial render

@@ -57,7 +57,7 @@ body::before {
 }
 
 .menu__categories button {
-  background: #fff;
+  background: transparent;
   border: 2px solid var(--first-color);
   border-radius: 24px;
   padding: 8px 16px;
@@ -74,7 +74,7 @@ body::before {
 
 /* CARD */
 .testimonial__card {
-  background: var(--container-color);
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 24px;
   text-align: center;
   padding: 24px;
@@ -91,7 +91,7 @@ body::before {
   height: 100%;
   object-fit: cover;
   border-radius: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 5px;
 }
 
 .testimonial__name {
@@ -114,7 +114,11 @@ body::before {
 
 .testimonial__stars i {
   font-size: 18px;
-  color: var(--second-color);
+  color: #ccc; /* default саарал од */
+}
+
+.testimonial__stars i.filled {
+  color: var(--second-color); /* шар од */
 }
 
 .testimonial__number {
@@ -134,7 +138,6 @@ body::before {
 /* RESPONSIVE */
 @media screen and (max-width: 767px) {
   .testimonial__card {
-    width: 250px;
     padding: 16px;
   }
 }
