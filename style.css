@@ -139,7 +139,9 @@ body::before {
 .swiper-button-next {
   display: none;
 }
-
+.testimonial__swiper {
+  padding-bottom: 50px;
+}
 .swiper-pagination {
   bottom: 10px !important;
 }
