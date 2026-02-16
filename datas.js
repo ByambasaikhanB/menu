@@ -24,11 +24,11 @@ const menuItems = [
     icons: ["🍄", "🥬", "🍅", "🧀"],
   },
   {
-    image: "/images/chicken-burger.png",
+    image: "/images/coctail/14bf45cc-6201-43cf-9354-f674b2c8ade8.jfif",
     name: "Chicken Burger",
     ingredients: ["Chicken", "Cheese", "Lettuce", "Spicy Sauce"],
     price: "$8.00",
     kcal: 520,
-    icons: ["🐓", "🧀", "🥬", "🌶️"],
+    icons: ["🍸"],
   },
 ];

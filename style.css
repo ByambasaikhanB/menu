@@ -56,6 +56,7 @@ body::before {
 }
 
 /* CARD */
+
 .testimonial__card {
   position: relative;
   border-radius: 10px;
@@ -74,7 +75,7 @@ body::before {
 .testimonial__img {
   display: block;
   width: 342px; /* original width */
-  height: 553px; /* original height */
+  height: 500px; /* original height */
   max-width: 100%;
   max-height: 100%;
 }
