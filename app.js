@@ -1,17 +1,19 @@
+const wrapper = document.getElementById("menu-wrapper");
+
 // Swiper init
 const swiperTestimonial = new Swiper(".testimonial__swiper", {
   loop: false,
-  slidesPerView: "auto", // visible slides
-  centeredSlides: true, // center single card
-  spaceBetween: 24, // карт хооронд зай
-  grabCursor: true, // cursor гүйлгэхэд
+  slidesPerView: "auto",
+  centeredSlides: true,
+  spaceBetween: 24,
+  grabCursor: true,
   speed: 600,
-  effect: "coverflow", // coverflow эффект
+  effect: "coverflow",
   coverflowEffect: {
-    rotate: 0, // эргэлт
-    stretch: 0, // суналт
-    depth: 0, // 3D гүн
-    modifier: 1, // эффектын хүч
+    rotate: 0,
+    stretch: 0,
+    depth: 0,
+    modifier: 1,
     slideShadows: false,
   },
   pagination: {
@@ -20,15 +22,32 @@ const swiperTestimonial = new Swiper(".testimonial__swiper", {
   },
 });
 
-// Render cards
-const wrapper = document.getElementById("menu-wrapper");
-
+// Render cards overlay мэдээлэлтэй, price ард icons, kcal нэмсэн
 function renderCards() {
   wrapper.innerHTML = "";
   menuItems.forEach((item) => {
     const card = document.createElement("article");
     card.classList.add("testimonial__card", "swiper-slide");
-    card.innerHTML = `<img src="${item.image}" alt="" class="testimonial__img" />`;
+
+    const iconsString = item.icons.join(" ");
+
+    card.innerHTML = `
+  <img src="${item.image}" alt="${item.name}" class="testimonial__img" />
+  <div class="testimonial__overlay">
+    <h3 class="testimonial__name">${item.name}</h3>
+    <p class="testimonial__description">
+      ${item.ingredients.join(", ")}
+    </p>
+    <div class="testimonial__extra">
+      <div class="testimonial__price-icons">
+        <span class="testimonial__price">${item.price}</span>
+        <span class="testimonial__icons">${item.icons.join("")}</span>
+      </div>
+      <span class="testimonial__kcal">${item.kcal} kcal</span>
+    </div>
+  </div>
+`;
+
     wrapper.appendChild(card);
   });
   swiperTestimonial.update();

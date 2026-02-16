@@ -22,11 +22,10 @@ body {
 }
 
 #nav-img img {
-  /* border: solid 1px white; */
   border-radius: 50%;
   height: 100px;
   display: block;
-  margin: 2rem auto 0 auto; /* дээд = 2rem, зүүн/баруун = auto, доод = 0 */
+  margin: 2rem auto 0 auto;
 }
 
 body::before {
@@ -37,15 +36,11 @@ body::before {
   width: 100%;
   height: 100%;
   background: linear-gradient(#092e1c, #00800d);
-  /* background-image: url(/images/75289845_1352163761631139_7531589860683939840_n.jpg); */
-  background-size: cover;
-  background-position: center;
   filter: blur(2px);
   z-index: -1;
 }
 
 .container {
-  background-repeat: no-repeat;
   max-width: 100%;
   margin: 0 auto;
   padding: 0 24px;
@@ -59,15 +54,17 @@ body::before {
   margin-bottom: 24px;
   color: white;
 }
+
 /* CARD */
 .testimonial__card {
-  background: rgba(255, 255, 255, 0.8);
-  margin-top: 3%;
+  position: relative;
   border-radius: 10px;
+  overflow: hidden;
   text-align: center;
-  padding: 5px;
-  box-shadow: 20px 20px 20px 20px rgba(0, 0, 0, 0.1);
-  transition: 0.3s;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  display: inline-block; /* original image size */
 }
 
 .testimonial__card:hover {
@@ -75,43 +72,66 @@ body::before {
 }
 
 .testimonial__img {
+  display: block;
+  width: 342px; /* original width */
+  height: 553px; /* original height */
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Overlay мэдээлэл */
+.testimonial__overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-  /* margin-bottom: 5px; */
-  transition: 0.5s ease-in;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 12px;
+  box-sizing: border-box;
+  font-family: var(--second-font);
 }
 
-.testimonial__name {
-  font-size: 2rem;
-  margin-bottom: 8px;
+/* Overlay текст */
+.testimonial__overlay h3 {
+  margin: 0;
+  font-size: 1.4rem;
 }
 
-.testimonial__description {
-  font-size: 0.95rem;
-  margin-bottom: 12px;
+.testimonial__overlay p {
+  font-size: 0.9rem;
+  margin: 4px 0;
 }
 
-.testimonial__rating {
+/* Price + icons мөр */
+.testimonial__extra {
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* зүүн талд price+icons, баруун талд kcal */
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  margin-top: 8px;
 }
 
-.testimonial__stars i {
-  font-size: 18px;
-  color: #ccc; /* default саарал од */
+.testimonial__price-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* price ба icons хооронд зай */
 }
 
-.testimonial__stars i.filled {
-  color: var(--second-color); /* шар од */
-}
-
-.testimonial__number {
+.testimonial__price {
+  font-size: 2rem;
   font-weight: bold;
+  color: var(--second-color);
+}
+
+.testimonial__icons {
+  font-size: 1.5rem;
+  display: flex;
+  gap: 4px; /* icons хооронд зай */
+}
+
+.testimonial__kcal {
+  font-style: italic;
+  color: #fff;
 }
 
 /* SWIPER */
@@ -128,13 +148,11 @@ body::before {
 @media screen and (max-width: 767px) {
   .testimonial__card {
     width: 100%;
-    margin: 0 auto;
-    /* padding: 20px; */
   }
 }
 
 @media screen and (min-width: 768px) {
   .testimonial__card {
-    width: 300px;
+    width: auto;
   }
 }
