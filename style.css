@@ -21,6 +21,14 @@ body {
   overflow: hidden;
 }
 
+#nav-img img {
+  /* border: solid 1px white; */
+  border-radius: 50%;
+  height: 100px;
+  display: block;
+  margin: 2rem auto 0 auto; /* дээд = 2rem, зүүн/баруун = auto, доод = 0 */
+}
+
 body::before {
   content: "";
   position: fixed;
@@ -28,7 +36,8 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url(/images/75289845_1352163761631139_7531589860683939840_n.jpg);
+  background: linear-gradient(#092e1c, #00800d);
+  /* background-image: url(/images/75289845_1352163761631139_7531589860683939840_n.jpg); */
   background-size: cover;
   background-position: center;
   filter: blur(2px);
@@ -37,7 +46,7 @@ body::before {
 
 .container {
   background-repeat: no-repeat;
-  max-width: 1120px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -48,37 +57,16 @@ body::before {
   font-size: 2rem;
   text-align: center;
   margin-bottom: 24px;
+  color: white;
 }
-
-/* CATEGORY BUTTONS */
-.menu__categories {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.menu__categories button {
-  background: transparent;
-  border: 2px solid var(--first-color);
-  border-radius: 24px;
-  padding: 8px 16px;
-  margin: 0 8px 12px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.menu__categories button.active,
-.menu__categories button:hover {
-  background: var(--first-color);
-  color: var(--white-color);
-}
-
 /* CARD */
 .testimonial__card {
   background: rgba(255, 255, 255, 0.8);
-  border-radius: 24px;
+  margin-top: 3%;
+  border-radius: 10px;
   text-align: center;
-  padding: 24px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  padding: 5px;
+  box-shadow: 20px 20px 20px 20px rgba(0, 0, 0, 0.1);
   transition: 0.3s;
 }
 
@@ -90,8 +78,9 @@ body::before {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 16px;
-  margin-bottom: 5px;
+  border-radius: 10px;
+  /* margin-bottom: 5px; */
+  transition: 0.5s ease-in;
 }
 
 .testimonial__name {
@@ -138,7 +127,9 @@ body::before {
 /* RESPONSIVE */
 @media screen and (max-width: 767px) {
   .testimonial__card {
-    padding: 16px;
+    width: 90%;
+    margin: 0 auto;
+    padding: 20px;
   }
 }
 

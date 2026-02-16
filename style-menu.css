@@ -1,0 +1,295 @@
+@font-face {
+  font-family: "Goldenbook";
+  src:
+    url("fonts/subset-Goldenbook.woff2") format("woff2"),
+    url("fonts/subset-Goldenbook.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cera PRO", sans-serif;
+  src:
+    url("fonts/subset-CeraPRO.woff2") format("woff2"),
+    url("fonts/subset-CeraPRO.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src:
+    url("fonts/subset-EBGaramond-Regular.woff2") format("woff2"),
+    url("fonts/subset-EBGaramond-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --primary: #ffffff; /* 350-100-40 */
+  --bg: #0f490f; /* 30-4-98 */
+  --bg-darker: #08461863; /* 30-4-95 */
+  --text-dim: #ffffff; /* 30-4-50 */
+}
+
+html,
+body {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-family: "EB Garamond", serif;
+}
+
+body {
+  display: flex;
+  background-color: var(--bg-darker);
+}
+body.lounge {
+  background: #141414;
+}
+main {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 2.4rem 7.2rem;
+  background-color: var(--bg);
+  box-shadow: 0 0 4.8rem 0 rgba(0, 0, 0, 0.05);
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+#header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3.6rem;
+}
+#header img {
+  height: 8.4rem;
+  margin-bottom: 3.6rem;
+}
+#header img .shape {
+  fill: var(--primary);
+}
+#header span {
+  display: block;
+  font-family: "Cera PRO", sans-serif;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+  color: var(--text-dim);
+}
+#header h1 {
+  font-family: "Goldenbook", serif;
+  text-transform: uppercase;
+  font-size: 4.8rem;
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  text-align: center;
+  color: var(--primary);
+}
+
+#body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#menu {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 3.6rem;
+}
+#menu a {
+  box-sizing: border-box;
+  padding: 1.2rem 0;
+  border: solid 1px var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+#menu a:hover {
+  background-color: gray;
+}
+#menu a:last-child {
+  margin-bottom: 0;
+}
+#menu a span {
+  display: block;
+  text-transform: uppercase;
+}
+#menu a span:first-child {
+  font-family: "Cera PRO", sans-serif;
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+#menu a span:last-child {
+  font-family: "Goldenbook", serif;
+  font-size: 2.4rem;
+  letter-spacing: -0.025em;
+  color: var(--primary);
+}
+
+#info {
+  flex: 1;
+}
+#info__phone {
+  margin-bottom: 2.4rem;
+  color: white;
+}
+#info__phone span:first-child {
+  display: block;
+  font-family: "Cera PRO", sans-serif;
+  font-weight: 400;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+  text-align: center;
+  color: white;
+}
+#info__phone span:last-child {
+  display: block;
+  font-family: "Goldenbook", serif;
+  text-transform: uppercase;
+  font-size: 3.6rem;
+  letter-spacing: -0.025em;
+  text-align: center;
+}
+
+#info__timetable {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 3.6rem;
+  gap: 1.8rem;
+}
+#info__timetable div {
+  flex: 1;
+}
+#info__timetable div:first-child {
+  text-align: right;
+}
+#info__timetable div:last-child {
+  text-align: left;
+}
+#info__timetable h2 {
+  font-family: "Cera PRO", sans-serif;
+  font-weight: 400;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+  color: var(--text-dim);
+}
+#info__timetable p {
+  white-space: nowrap;
+  font-size: 1.4rem;
+  line-height: 1.2;
+  color: white;
+}
+
+#info__back {
+  display: flex;
+  justify-content: center;
+}
+#info__back a {
+  display: inline-block;
+  font-family: "Cera PRO", sans-serif;
+  font-weight: 400;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border-bottom: solid 1px var(--text-dim);
+  padding-bottom: 0.6rem;
+}
+
+#footer {
+  font-size: 1.6rem;
+  line-height: 1;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+/* LANDSCAPE */
+@media only screen and (max-width: 2560px) and (min-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 83.333%;
+  }
+}
+@media only screen and (max-width: 1920px) and (min-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 62.5%;
+  }
+}
+@media only screen and (max-width: 1680px) and (min-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 54.6875%;
+  }
+}
+@media only screen and (max-width: 1440px) and (min-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 46.875%;
+  }
+}
+@media only screen and (max-width: 1366px) and (min-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 44.466%;
+  }
+}
+@media only screen and (max-width: 1280px) and (min-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 41.666%;
+  }
+}
+@media only screen and (max-width: 1024px) and (min-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 33.333%;
+  }
+}
+
+@media only screen and (max-width: 10240px) and (max-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 93.75%;
+  }
+}
+@media only screen and (max-width: 900px) and (max-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 75%;
+  }
+}
+@media only screen and (max-width: 768px) and (max-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 68.75%;
+  }
+}
+@media only screen and (max-width: 600px) and (max-aspect-ratio: 1/1) {
+  html,
+  body {
+    font-size: 46.875%;
+  }
+  main {
+    width: 100%;
+    margin: 0;
+    padding: 3.6rem;
+    box-shadow: none;
+  }
+}

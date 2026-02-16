@@ -1,89 +1,38 @@
 // Swiper init
 const swiperTestimonial = new Swiper(".testimonial__swiper", {
-  loop: true,
-  slidesPerView: "auto",
-  centeredSlides: true,
-  spaceBetween: 16,
-  grabCursor: true,
+  loop: false,
+  slidesPerView: "auto", // visible slides
+  centeredSlides: true, // center single card
+  spaceBetween: 24, // карт хооронд зай
+  grabCursor: true, // cursor гүйлгэхэд
   speed: 600,
-  effect: "coverflow",
-  coverflowEffect: { rotate: 0, depth: 500, modifier: 1, slideShadows: true },
-  pagination: { el: ".swiper-pagination", clickable: true },
-  autoplay: { delay: 99999, disableOnInteraction: false },
-});
-
-// Categories
-const categories = [
-  "all",
-  "lunch",
-  "salad",
-  "soup",
-  "european",
-  "mongolian",
-  "cocktail",
-  "share",
-];
-const catWrapper = document.querySelector(".menu__categories");
-
-categories.forEach((cat) => {
-  const btn = document.createElement("button");
-  btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
-  btn.dataset.category = cat;
-  if (cat === "all") btn.classList.add("active");
-  catWrapper.appendChild(btn);
+  effect: "coverflow", // coverflow эффект
+  coverflowEffect: {
+    rotate: 0, // эргэлт
+    stretch: 0, // суналт
+    depth: 0, // 3D гүн
+    modifier: 1, // эффектын хүч
+    slideShadows: false,
+  },
+  pagination: {
+    el: ".swiper-pagination",
+    clickable: true,
+  },
 });
 
 // Render cards
 const wrapper = document.getElementById("menu-wrapper");
 
-function renderCards(category = "all") {
+function renderCards() {
   wrapper.innerHTML = "";
-  const filtered =
-    category === "all"
-      ? menuItems
-      : menuItems.filter((item) => item.category === category);
-
-  filtered.forEach((item) => {
+  menuItems.forEach((item) => {
     const card = document.createElement("article");
     card.classList.add("testimonial__card", "swiper-slide");
-
-    // Stars
-    let starsHTML = "";
-    for (let i = 1; i <= 5; i++) {
-      if (i <= item.rating) {
-        starsHTML += '<i class="ri-star-fill filled"></i>';
-      } else {
-        starsHTML += '<i class="ri-star-fill"></i>';
-      }
-    }
-
-    card.innerHTML = `
-      <img src="${item.image}" alt="${item.name}" class="testimonial__img" />
-      <h3 class="testimonial__name">${item.name}</h3>
-      <div class="testimonial__rating">
-        <div class="testimonial__stars">${starsHTML}</div>
-        <h3 class="testimonial__number">${item.rating.toFixed(1)}</h3>
-      </div>
-      <p class="testimonial__description">${item.description}</p>
-      <h1>Price ${item.price}₮</h1>
-    `;
-
+    card.innerHTML = `<img src="${item.image}" alt="" class="testimonial__img" />`;
     wrapper.appendChild(card);
   });
-
   swiperTestimonial.update();
 }
 
 // Initial render
 renderCards();
-
-// Category filter
-document.querySelectorAll(".menu__categories button").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    document
-      .querySelectorAll(".menu__categories button")
-      .forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    renderCards(btn.dataset.category);
-  });
-});
