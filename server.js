@@ -8,12 +8,12 @@ const fs = require("fs");
 const app = express();
 
 // ================= DATABASE =================
+// Render.com-д DATABASE_URL environment variable ашиглана
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "menu_db",
-  password: "mypassword123", // <-- өөрчил
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // Render PostgreSQL-д шаардлагатай
+  },
 });
 
 // ================= MIDDLEWARE =================
@@ -83,8 +83,8 @@ app.get("/menu/:category", async (req, res) => {
 });
 
 // ================= SERVER START =================
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
