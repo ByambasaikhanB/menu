@@ -1,0 +1,84 @@
+/* BASE STYLING */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Montserrat", sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #092e1c, #00800d);
+  color: #fff;
+}
+
+/* LOGIN CARD */
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 40px 30px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.login-card h2 {
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+/* INPUTS */
+.login-card input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+}
+
+/* BUTTON */
+.login-card button {
+  width: 100%;
+  padding: 12px;
+  background-color: #f0c000;
+  color: #000;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 1rem;
+}
+
+.login-card button:hover {
+  background-color: #fff;
+  transform: scale(1.05);
+}
+
+/* ERROR MESSAGE */
+#login-error {
+  margin-top: 15px;
+  color: #ff6b6b;
+  display: none;
+  font-weight: bold;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 20px;
+  }
+}

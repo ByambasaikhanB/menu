@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login | Grand Crown Irish Pub</title>
+    <link rel="stylesheet" href="login.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <h2>Admin Login</h2>
+        <form id="loginForm" autocomplete="off">
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            required
+            autocomplete="off"
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+            autocomplete="off"
+          />
+          <button type="submit">Login</button>
+        </form>
+        <p id="login-error">Нэвтрэх нэр эсвэл нууц үг буруу</p>
+      </div>
+    </div>
+
+    <script>
+      const loginForm = document.getElementById("loginForm");
+      const loginError = document.getElementById("login-error");
+      loginError.style.display = "none";
+
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(loginForm);
+        const username = formData.get("username");
+        const password = formData.get("password");
+
+        // Жишээ зориулалт: username=admin, password=admin123
+        if (username === "admin" && password === "admin123") {
+          window.location.href = "admin.html"; // Амжилттай нэвтэрсэн
+        } else {
+          loginError.style.display = "block"; // Алдаа
+        }
+      });
+    </script>
+  </body>
+</html>

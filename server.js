@@ -1,45 +1,90 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
+const app = express();
+
+// ================= DATABASE =================
 const pool = new Pool({
   user: "postgres",
   host: "localhost",
   database: "menu_db",
-  password: "1234",
+  password: "mypassword123", // <-- өөрчил
   port: 5432,
 });
 
-const app = express();
+// ================= MIDDLEWARE =================
 app.use(bodyParser.json());
-app.use(express.static("public")); // public folder serve
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
-// POST admin-аас
-app.post("/api/menu", async (req, res) => {
-  const { image_url, name, ingredients, price, kcal, icons } = req.body;
+// ================= UPLOAD FOLDER =================
+const uploadPath = path.join(__dirname, "public/uploads");
+
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+// ================= MULTER =================
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
+
+// ================= ADD MENU =================
+app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
+    const { name, ingredients, price, kcal, icons, category } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ error: "Image required" });
+    }
+
+    const image_url = "/uploads/" + req.file.filename;
+
     await pool.query(
-      "INSERT INTO menu_items (image_url, name, ingredients, price, kcal, icons) VALUES ($1,$2,$3,$4,$5,$6)",
-      [image_url, name, ingredients, price, kcal, icons],
+      `INSERT INTO menu_items
+       (image_url, name, ingredients, price, kcal, icons, category)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+      [image_url, name, ingredients, price, kcal, icons, category],
     );
-    res.status(200).send("Item added");
+
+    res.json({ success: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Error");
+    console.error("INSERT ERROR:", err);
+    res.status(500).json({ error: "Database error" });
   }
 });
 
-// GET menu вэб рүү харуулах
-app.get("/api/menu", async (req, res) => {
+// ================= GET BY CATEGORY =================
+app.get("/menu/:category", async (req, res) => {
   try {
+    const { category } = req.params;
+
     const result = await pool.query(
-      "SELECT * FROM menu_items ORDER BY id DESC",
+      "SELECT * FROM menu_items WHERE category = $1 ORDER BY id DESC",
+      [category],
     );
+
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Error");
+    console.error("FETCH ERROR:", err);
+    res.status(500).json({ error: "Database error" });
   }
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+// ================= SERVER START =================
+const PORT = 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

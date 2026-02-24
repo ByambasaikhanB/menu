@@ -21,7 +21,9 @@
   "homepage": "https://github.com/ByambasaikhanB/menu#readme",
   "dependencies": {
     "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
     "express": "^5.2.1",
+    "multer": "^2.0.2",
     "pg": "^8.18.0"
   }
 }

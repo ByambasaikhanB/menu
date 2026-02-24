@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Menu</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"
+    />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+
+  <body>
+    <h2>Admin Menu</h2>
+
+    <form id="menuForm" autocomplete="off" enctype="multipart/form-data">
+      <!-- IMAGE UPLOAD -->
+      <input
+        type="file"
+        name="image"
+        accept="image/*"
+        required
+        autocomplete="off"
+      /><br />
+
+      <!-- IMAGE PREVIEW -->
+      <img
+        id="imagePreview"
+        src=""
+        alt="Preview"
+        style="
+          display: none;
+          width: 150px;
+          border-radius: 12px;
+          margin-bottom: 10px;
+        "
+      /><br />
+
+      <!-- OTHER INPUTS -->
+      <input
+        type="text"
+        name="name"
+        placeholder="Name"
+        required
+        autocomplete="off"
+      /><br />
+
+      <textarea
+        name="ingredients"
+        placeholder="Ingredients"
+        required
+        autocomplete="off"
+      ></textarea
+      ><br />
+
+      <input
+        type="number"
+        step="0.01"
+        name="price"
+        placeholder="Price"
+        required
+        autocomplete="off"
+      /><br />
+
+      <input
+        type="number"
+        name="kcal"
+        placeholder="Kcal"
+        required
+        autocomplete="off"
+      /><br />
+
+      <input
+        type="text"
+        name="icons"
+        placeholder="Icons"
+        autocomplete="off"
+      /><br />
+
+      <!-- CATEGORY SELECT -->
+      <select name="category" required autocomplete="off">
+        <option value="">Select category</option>
+        <option value="food">Food</option>
+        <option value="cocktail">Cocktail</option>
+        <option value="lunch">Lunch</option>
+        <option value="dessert">Dessert</option></select
+      ><br />
+
+      <button type="submit">Add Item</button>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    <script src="/admin.js"></script>
+  </body>
+</html>

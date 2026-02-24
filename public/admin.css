@@ -1,0 +1,152 @@
+/* ================= BASE ================= */
+:root {
+  --primary: #ffffff;
+  --secondary: #f0c000;
+  --bg: rgba(0, 80, 0, 0.75);
+  --text-color: #ffffff;
+  --input-radius: 8px;
+  --form-max-width: 420px;
+}
+
+/* ================= BODY ================= */
+body {
+  margin: 0;
+  font-family: "Cera PRO", sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background Image */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("/images/75289845_1352163761631139_7531589860683939840_n.jpg")
+    center/cover no-repeat;
+  filter: blur(10px);
+  transform: scale(1.1);
+  z-index: -2;
+}
+
+/* Dark Overlay */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+}
+#imagePreview {
+  object-fit: cover; /* crop */
+  object-position: center; /* гол хэсэг харагдана */
+  border-radius: 12px;
+  display: block;
+}
+/* ================= HEADER ================= */
+h2 {
+  color: var(--primary);
+  font-size: 3rem;
+  text-align: center;
+  margin: 2rem 0;
+  letter-spacing: 2px;
+}
+
+/* ================= FORM ================= */
+form#menuForm {
+  width: 90%;
+  max-width: var(--form-max-width);
+  background: var(--bg);
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* ================= INPUTS ================= */
+form#menuForm input,
+form#menuForm textarea,
+form#menuForm select {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.9rem;
+  border-radius: var(--input-radius);
+  border: none;
+  font-size: 1rem;
+  box-sizing: border-box;
+  outline: none;
+}
+
+/* File Input Custom Style */
+form#menuForm input[type="file"] {
+  background: #ffffff;
+  padding: 0.6rem;
+  cursor: pointer;
+}
+
+/* Focus Effect */
+form#menuForm input:focus,
+form#menuForm textarea:focus,
+form#menuForm select:focus {
+  box-shadow: 0 0 0 2px var(--secondary);
+}
+
+/* ================= BUTTON ================= */
+form#menuForm button {
+  background-color: var(--primary);
+  color: #084618;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0.9rem;
+  border-radius: var(--input-radius);
+  border: none;
+  transition: 0.3s ease;
+  font-size: 1rem;
+}
+
+form#menuForm button:hover {
+  background-color: var(--secondary);
+  transform: translateY(-2px);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  h2 {
+    font-size: 2.2rem;
+  }
+
+  form#menuForm {
+    padding: 1.5rem;
+  }
+
+  form#menuForm input,
+  form#menuForm textarea,
+  form#menuForm select,
+  form#menuForm button {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  form#menuForm {
+    padding: 1.2rem;
+  }
+
+  form#menuForm input,
+  form#menuForm textarea,
+  form#menuForm select,
+  form#menuForm button {
+    font-size: 0.9rem;
+  }
+}
