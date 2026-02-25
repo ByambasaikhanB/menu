@@ -2,15 +2,14 @@ const form = document.getElementById("menuForm");
 const imageInput = form.querySelector('input[name="image"]');
 const imagePreview = document.getElementById("imagePreview");
 
-// ================= IMAGE PREVIEW =================
+// =============== IMAGE PREVIEW =================
 imageInput.addEventListener("change", () => {
   const file = imageInput.files[0];
-
   if (file) {
     const reader = new FileReader();
     reader.onload = function (e) {
       imagePreview.src = e.target.result;
-      imagePreview.style.display = "block"; // preview харагдана
+      imagePreview.style.display = "block";
     };
     reader.readAsDataURL(file);
   } else {
@@ -19,10 +18,9 @@ imageInput.addEventListener("change", () => {
   }
 });
 
-// ================= FORM SUBMIT =================
+// =============== ADD ITEM =================
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const formData = new FormData(form);
 
   try {
@@ -32,13 +30,12 @@ form.addEventListener("submit", async (e) => {
     });
 
     const result = await response.json();
-
     if (result.success) {
       alert("Амжилттай нэмэгдлээ!");
       form.reset();
       imagePreview.src = "";
       imagePreview.style.display = "none";
-      loadMenu(); // шинэ item нэмэгдсэн тохиолдолд table update
+      loadMenu();
     } else {
       alert("Алдаа гарлаа");
     }
@@ -48,7 +45,7 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// ================= LOAD EXISTING MENU =================
+// =============== LOAD MENU =================
 async function loadMenu() {
   try {
     const res = await fetch("/menu");
@@ -78,7 +75,7 @@ async function loadMenu() {
   }
 }
 
-// ================= UPDATE ITEM =================
+// =============== UPDATE ITEM =================
 async function updateItem(id, btn) {
   const row = btn.parentElement.parentElement;
   const payload = {
@@ -87,7 +84,7 @@ async function updateItem(id, btn) {
     price: row.children[4].innerText,
     kcal: row.children[5].innerText,
     icons: row.children[6].innerText,
-    category: row.children[7].innerText,
+    category: row.children[7].innerText.toLowerCase(), // lowercase
   };
 
   await fetch(`/menu/${id}`, {
@@ -99,7 +96,7 @@ async function updateItem(id, btn) {
   loadMenu();
 }
 
-// ================= DELETE ITEM =================
+// =============== DELETE ITEM =================
 async function deleteItem(id) {
   if (confirm("Delete this item?")) {
     await fetch(`/menu/${id}`, { method: "DELETE" });
@@ -107,5 +104,5 @@ async function deleteItem(id) {
   }
 }
 
-// ================= INITIAL LOAD =================
+// =============== INITIAL LOAD =================
 loadMenu();

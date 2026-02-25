@@ -1,4 +1,3 @@
-/* ================= BASE ================= */
 :root {
   --primary: #ffffff;
   --secondary: #f0c000;
@@ -6,11 +5,8 @@
   --text-color: #ffffff;
   --input-radius: 8px;
   --form-max-width: 420px;
-  --table-bg: rgba(0, 0, 0, 0.6);
-  --table-header: rgba(0, 0, 0, 0.8);
 }
 
-/* ================= BODY ================= */
 body {
   margin: 0;
   font-family: "Cera PRO", sans-serif;
@@ -21,10 +17,9 @@ body {
   justify-content: flex-start;
   position: relative;
   overflow-x: hidden;
-  color: var(--text-color);
 }
 
-/* Background Image */
+/* Background */
 body::before {
   content: "";
   position: fixed;
@@ -36,7 +31,7 @@ body::before {
   z-index: -2;
 }
 
-/* Dark Overlay */
+/* Dark overlay */
 body::after {
   content: "";
   position: fixed;
@@ -46,13 +41,12 @@ body::after {
 }
 
 #imagePreview {
-  object-fit: cover; /* crop */
-  object-position: center; /* гол хэсэг харагдана */
+  object-fit: cover;
+  object-position: center;
   border-radius: 12px;
   display: block;
 }
 
-/* ================= HEADER ================= */
 h2 {
   color: var(--primary);
   font-size: 3rem;
@@ -61,7 +55,6 @@ h2 {
   letter-spacing: 2px;
 }
 
-/* ================= FORM ================= */
 form#menuForm {
   width: 90%;
   max-width: var(--form-max-width);
@@ -75,7 +68,6 @@ form#menuForm {
   box-sizing: border-box;
 }
 
-/* ================= INPUTS ================= */
 form#menuForm input,
 form#menuForm textarea,
 form#menuForm select {
@@ -89,21 +81,18 @@ form#menuForm select {
   outline: none;
 }
 
-/* File Input Custom Style */
 form#menuForm input[type="file"] {
   background: #ffffff;
   padding: 0.6rem;
   cursor: pointer;
 }
 
-/* Focus Effect */
 form#menuForm input:focus,
 form#menuForm textarea:focus,
 form#menuForm select:focus {
   box-shadow: 0 0 0 2px var(--secondary);
 }
 
-/* ================= BUTTON ================= */
 form#menuForm button {
   background-color: var(--primary);
   color: #084618;
@@ -121,68 +110,43 @@ form#menuForm button:hover {
   transform: translateY(-2px);
 }
 
-/* ================= TABLE ================= */
 table#menuTable {
-  width: 95%;
-  max-width: 1000px;
-  margin: 2rem auto;
+  width: 90%;
+  max-width: var(--form-max-width);
+  margin-top: 1rem;
   border-collapse: collapse;
-  background: var(--table-bg);
+  background: var(--bg);
   color: var(--text-color);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 table#menuTable th,
 table#menuTable td {
-  padding: 0.8rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-table#menuTable th {
-  background: var(--table-header);
-  font-weight: bold;
-}
-
-table#menuTable tbody tr:hover {
-  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  text-align: center;
 }
 
 table#menuTable img {
-  border-radius: 8px;
+  border-radius: 6px;
+  object-fit: cover;
 }
 
-/* ================= ACTION BUTTONS ================= */
 table#menuTable button {
-  background: var(--primary);
-  color: #084618;
-  font-weight: bold;
   padding: 0.3rem 0.6rem;
-  margin-right: 0.3rem;
+  margin: 0 2px;
   border-radius: 6px;
   border: none;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: 0.2s ease;
 }
 
-table#menuTable button:hover {
-  background: var(--secondary);
-  transform: translateY(-1px);
-}
-
-/* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   h2 {
     font-size: 2.2rem;
   }
   form#menuForm {
     padding: 1.5rem;
-  }
-  table#menuTable {
-    font-size: 0.9rem;
   }
 }
 
@@ -192,12 +156,5 @@ table#menuTable button:hover {
   }
   form#menuForm {
     padding: 1.2rem;
-  }
-  table#menuTable {
-    font-size: 0.8rem;
-  }
-  table#menuTable th,
-  table#menuTable td {
-    padding: 0.5rem;
   }
 }
