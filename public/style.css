@@ -12,23 +12,22 @@
   --second-font: "Unbounded", sans-serif;
 }
 
-/* RESET */
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-
 /* GENERAL */
 body {
   font-family: var(--body-font);
   background-color: var(--body-color);
+  margin: 0;
   position: relative;
-  overflow-x: hidden; /* зөвхөн хөндлөн scroll хаана */
+  overflow: hidden;
 }
 
-/* Background gradient (ӨМНӨХИЙГ ХАДГАЛСАН) */
+#nav-img img {
+  border-radius: 50%;
+  height: 100px;
+  display: block;
+  margin: 2rem auto 0 auto;
+}
+
 body::before {
   content: "";
   position: fixed;
@@ -39,13 +38,6 @@ body::before {
   background: linear-gradient(#092e1c, #00800d);
   filter: blur(2px);
   z-index: -1;
-}
-
-#nav-img img {
-  border-radius: 50%;
-  height: 100px;
-  display: block;
-  margin: 2rem auto 0 auto;
 }
 
 .container {
@@ -64,6 +56,7 @@ body::before {
 }
 
 /* CARD */
+
 .testimonial__card {
   position: relative;
   border-radius: 10px;
@@ -79,13 +72,12 @@ body::before {
   transform: translateY(-8px);
 }
 
-/* IMAGE (ЖААХАН ЗАСВАР) */
 .testimonial__img {
   display: block;
-  width: 342px; /* original width хадгалсан */
-  height: 500px; /* original height хадгалсан */
+  width: 342px; /* original width */
+  height: 500px; /* original height */
   max-width: 100%;
-  object-fit: cover; /* 🔥 нэмсэн – mobile дээр тасрахгүй */
+  max-height: 100%;
 }
 
 /* Overlay мэдээлэл */
@@ -115,7 +107,7 @@ body::before {
 /* Price + icons мөр */
 .testimonial__extra {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* зүүн талд price+icons, баруун талд kcal */
   align-items: center;
   margin-top: 8px;
 }
@@ -123,7 +115,7 @@ body::before {
 .testimonial__price-icons {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 6px; /* price ба icons хооронд зай */
 }
 
 .testimonial__price {
@@ -135,7 +127,7 @@ body::before {
 .testimonial__icons {
   font-size: 1.5rem;
   display: flex;
-  gap: 4px;
+  gap: 4px; /* icons хооронд зай */
 }
 
 .testimonial__kcal {
@@ -148,49 +140,22 @@ body::before {
 .swiper-button-next {
   display: none;
 }
-
 .testimonial__swiper {
   padding-bottom: 50px;
 }
-
 .swiper-pagination {
   bottom: 10px !important;
 }
 
 /* RESPONSIVE */
-
-/* Tablet */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 767px) {
   .testimonial__card {
-    width: auto;
-  }
-
-  .testimonial__img {
     width: 100%;
-    height: 480px;
   }
 }
 
-/* iPhone 12 Pro Max (428px) */
-@media screen and (max-width: 430px) {
-  .testimonial__img {
-    width: 100%;
-    height: 450px;
-  }
-
-  .testimonial__overlay h3 {
-    font-size: 1.2rem;
-  }
-
-  .testimonial__overlay p {
-    font-size: 0.8rem;
-  }
-
-  .testimonial__price {
-    font-size: 1.6rem;
-  }
-
-  .testimonial__icons {
-    font-size: 1.2rem;
+@media screen and (min-width: 768px) {
+  .testimonial__card {
+    width: auto;
   }
 }
