@@ -84,7 +84,7 @@ async function updateItem(id, btn) {
     price: row.children[4].innerText,
     kcal: row.children[5].innerText,
     icons: row.children[6].innerText,
-    category: row.children[7].innerText.toLowerCase(), // lowercase
+    category: row.children[7].innerText.toLowerCase(),
   };
 
   await fetch(`/menu/${id}`, {

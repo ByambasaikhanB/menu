@@ -75,7 +75,7 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
   }
 });
 
-// ================= GET MENU =================
+// ================= GET ALL MENU =================
 app.get("/menu", async (req, res) => {
   try {
     const result = await pool.query(
@@ -84,6 +84,21 @@ app.get("/menu", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("FETCH ERROR:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// ================= GET MENU BY CATEGORY =================
+app.get("/menu/:category", async (req, res) => {
+  const { category } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT * FROM menu_items WHERE category=$1 ORDER BY id DESC",
+      [category.toLowerCase()],
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("FETCH BY CATEGORY ERROR:", err);
     res.status(500).json({ error: "Database error" });
   }
 });

@@ -13,7 +13,7 @@ const swiper = new Swiper(".testimonial__swiper", {
   },
 });
 
-// ================= FETCH FOOD MENU =================
+// ================= FETCH MENU BY CATEGORY =================
 async function loadMenu(category) {
   try {
     const response = await fetch(`/menu/${category}`);
@@ -45,5 +45,3 @@ async function loadMenu(category) {
     console.error(err);
   }
 }
-
-loadFoodMenu();
