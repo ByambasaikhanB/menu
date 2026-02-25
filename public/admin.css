@@ -6,6 +6,8 @@
   --text-color: #ffffff;
   --input-radius: 8px;
   --form-max-width: 420px;
+  --table-bg: rgba(0, 0, 0, 0.6);
+  --table-header: rgba(0, 0, 0, 0.8);
 }
 
 /* ================= BODY ================= */
@@ -19,6 +21,7 @@ body {
   justify-content: flex-start;
   position: relative;
   overflow-x: hidden;
+  color: var(--text-color);
 }
 
 /* Background Image */
@@ -41,12 +44,14 @@ body::after {
   background: rgba(0, 0, 0, 0.5);
   z-index: -1;
 }
+
 #imagePreview {
   object-fit: cover; /* crop */
   object-position: center; /* гол хэсэг харагдана */
   border-radius: 12px;
   display: block;
 }
+
 /* ================= HEADER ================= */
 h2 {
   color: var(--primary);
@@ -116,21 +121,68 @@ form#menuForm button:hover {
   transform: translateY(-2px);
 }
 
+/* ================= TABLE ================= */
+table#menuTable {
+  width: 95%;
+  max-width: 1000px;
+  margin: 2rem auto;
+  border-collapse: collapse;
+  background: var(--table-bg);
+  color: var(--text-color);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+table#menuTable th,
+table#menuTable td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+table#menuTable th {
+  background: var(--table-header);
+  font-weight: bold;
+}
+
+table#menuTable tbody tr:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+table#menuTable img {
+  border-radius: 8px;
+}
+
+/* ================= ACTION BUTTONS ================= */
+table#menuTable button {
+  background: var(--primary);
+  color: #084618;
+  font-weight: bold;
+  padding: 0.3rem 0.6rem;
+  margin-right: 0.3rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.2s ease;
+}
+
+table#menuTable button:hover {
+  background: var(--secondary);
+  transform: translateY(-1px);
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   h2 {
     font-size: 2.2rem;
   }
-
   form#menuForm {
     padding: 1.5rem;
   }
-
-  form#menuForm input,
-  form#menuForm textarea,
-  form#menuForm select,
-  form#menuForm button {
-    font-size: 0.95rem;
+  table#menuTable {
+    font-size: 0.9rem;
   }
 }
 
@@ -138,15 +190,14 @@ form#menuForm button:hover {
   h2 {
     font-size: 1.8rem;
   }
-
   form#menuForm {
     padding: 1.2rem;
   }
-
-  form#menuForm input,
-  form#menuForm textarea,
-  form#menuForm select,
-  form#menuForm button {
-    font-size: 0.9rem;
+  table#menuTable {
+    font-size: 0.8rem;
+  }
+  table#menuTable th,
+  table#menuTable td {
+    padding: 0.5rem;
   }
 }
