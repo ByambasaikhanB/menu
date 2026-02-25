@@ -1,9 +1,12 @@
+// server.js
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
 const multer = require("multer");
 const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
+require("dotenv").config(); // .env файлыг ашиглах бол
 
 const app = express();
 
@@ -54,20 +57,40 @@ initDB();
 // ================= ADD MENU =================
 app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: "Image required" });
+    if (!req.file) {
+      console.error("UPLOAD ERROR: No file uploaded");
+      return res.status(400).json({ success: false, error: "Image required" });
+    }
 
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "menu_items",
-    });
-    const image_url = result.secure_url;
+    console.log("File received:", req.file.originalname, req.file.path);
 
+    // Cloudinary upload
+    let image_url;
+    try {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "menu_items",
+      });
+      image_url = result.secure_url;
+      console.log("Cloudinary upload success:", image_url);
+    } catch (cloudErr) {
+      console.error("CLOUDINARY ERROR:", cloudErr);
+      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      return res
+        .status(500)
+        .json({ success: false, error: "Cloudinary upload failed" });
+    }
+
+    // DB insert
     const { name, ingredients, price, kcal, icons, category } = req.body;
 
-    await pool.query(
-      `INSERT INTO menu_items
-       (image_url, name, ingredients, price, kcal, icons, category)
-       VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-      [
+    try {
+      const query = `
+        INSERT INTO menu_items
+        (image_url, name, ingredients, price, kcal, icons, category)
+        VALUES ($1,$2,$3,$4,$5,$6,$7)
+        RETURNING *;
+      `;
+      const values = [
         image_url,
         name,
         ingredients || null,
@@ -75,15 +98,23 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
         kcal || null,
         icons || null,
         category?.toLowerCase() || "food",
-      ],
-    );
+      ];
 
-    fs.unlinkSync(req.file.path); // түр файл устгах
+      const result = await pool.query(query, values);
+      console.log("DB insert success:", result.rows[0]);
 
-    res.json({ success: true });
+      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+
+      res.json({ success: true, item: result.rows[0] });
+    } catch (dbErr) {
+      console.error("DB INSERT ERROR:", dbErr);
+      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      res.status(500).json({ success: false, error: "Database insert failed" });
+    }
   } catch (err) {
-    console.error("INSERT ERROR:", err);
-    res.status(500).json({ error: "Database error" });
+    console.error("UNEXPECTED ERROR:", err);
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    res.status(500).json({ success: false, error: "Unexpected server error" });
   }
 });
 
