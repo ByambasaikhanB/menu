@@ -4,7 +4,6 @@ const { Pool } = require("pg");
 const multer = require("multer");
 const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
-const path = require("path");
 
 const app = express();
 
@@ -36,9 +35,9 @@ async function initDB() {
       CREATE TABLE IF NOT EXISTS menu_items (
         id SERIAL PRIMARY KEY,
         image_url TEXT,
-        name TEXT,
+        name TEXT NOT NULL,
         ingredients TEXT,
-        price TEXT,
+        price TEXT NOT NULL,
         kcal TEXT,
         icons TEXT,
         category TEXT
@@ -55,15 +54,14 @@ initDB();
 // ================= ADD MENU =================
 app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
-    const { name, ingredients, price, kcal, icons, category } = req.body;
-
     if (!req.file) return res.status(400).json({ error: "Image required" });
 
-    // Cloudinary-д upload хийх
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "menu_items",
     });
     const image_url = result.secure_url;
+
+    const { name, ingredients, price, kcal, icons, category } = req.body;
 
     await pool.query(
       `INSERT INTO menu_items
