@@ -6,44 +6,39 @@
   --first-color: hsl(265, 75%, 48%);
   --second-color: hsl(18, 88%, 58%);
   --white-color: #fff;
-  --body-color: hsl(220, 4%, 99%);
-  --container-color: #fff;
   --body-font: "Montserrat", sans-serif;
   --second-font: "Unbounded", sans-serif;
 }
 
-/* GENERAL */
-body {
-  font-family: var(--body-font);
-  background-color: var(--body-color);
+/* RESET */
+* {
+  box-sizing: border-box;
   margin: 0;
-  position: relative;
-  overflow: hidden;
+  padding: 0;
 }
 
+/* BODY */
+html,
+body {
+  height: 100%;
+  background: linear-gradient(#092e1c, #00800d);
+  font-family: var(--body-font);
+  overflow-x: hidden;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* LOGO */
 #nav-img img {
   border-radius: 50%;
   height: 100px;
   display: block;
-  margin: 2rem auto 0 auto;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(#092e1c, #00800d);
-  filter: blur(2px);
-  z-index: -1;
-}
-
-.container {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0 24px;
+  margin: 2rem auto 1rem auto;
 }
 
 /* TITLE */
@@ -56,106 +51,118 @@ body::before {
 }
 
 /* CARD */
-
 .testimonial__card {
   position: relative;
-  border-radius: 10px;
+  border-radius: 16px;
   overflow: hidden;
   text-align: center;
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
   transition: transform 0.3s ease;
-  cursor: pointer;
-  display: inline-block; /* original image size */
 }
 
 .testimonial__card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px);
 }
 
+/* IMAGE */
 .testimonial__img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
   display: block;
-  width: 342px; /* original width */
-  height: 500px; /* original height */
-  max-width: 100%;
-  max-height: 100%;
 }
 
-/* Overlay мэдээлэл */
+/* OVERLAY */
 .testimonial__overlay {
   position: absolute;
   bottom: 0;
-  left: 0;
   width: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  padding: 12px;
-  box-sizing: border-box;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9),
+    rgba(0, 0, 0, 0.5),
+    transparent
+  );
+  color: white;
+  padding: 16px;
   font-family: var(--second-font);
 }
 
-/* Overlay текст */
 .testimonial__overlay h3 {
-  margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
+  margin-bottom: 4px;
 }
 
 .testimonial__overlay p {
-  font-size: 0.9rem;
-  margin: 4px 0;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
 }
 
-/* Price + icons мөр */
+/* PRICE + ICON ROW */
 .testimonial__extra {
   display: flex;
-  justify-content: space-between; /* зүүн талд price+icons, баруун талд kcal */
+  justify-content: space-between;
   align-items: center;
-  margin-top: 8px;
 }
 
 .testimonial__price-icons {
   display: flex;
   align-items: center;
-  gap: 6px; /* price ба icons хооронд зай */
+  gap: 8px;
 }
 
 .testimonial__price {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: bold;
   color: var(--second-color);
 }
 
 .testimonial__icons {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   display: flex;
-  gap: 4px; /* icons хооронд зай */
+  gap: 4px;
 }
 
 .testimonial__kcal {
+  font-size: 0.8rem;
   font-style: italic;
-  color: #fff;
 }
 
 /* SWIPER */
-.swiper-button-prev,
-.swiper-button-next {
-  display: none;
-}
 .testimonial__swiper {
   padding-bottom: 50px;
 }
-.swiper-pagination {
-  bottom: 10px !important;
+
+.swiper-pagination-bullet {
+  background: white;
+  opacity: 0.6;
 }
 
-/* RESPONSIVE */
-@media screen and (max-width: 767px) {
-  .testimonial__card {
-    width: 100%;
+.swiper-pagination-bullet-active {
+  opacity: 1;
+}
+
+/* MOBILE OPTIMIZATION */
+@media screen and (max-width: 768px) {
+  .testimonial__img {
+    height: 420px;
+  }
+
+  .testimonial__overlay h3 {
+    font-size: 1.1rem;
+  }
+
+  .testimonial__price {
+    font-size: 1.5rem;
   }
 }
 
-@media screen and (min-width: 768px) {
-  .testimonial__card {
-    width: auto;
+@media screen and (max-width: 480px) {
+  .testimonial__img {
+    height: 380px;
+  }
+
+  .testimonial__overlay {
+    padding: 12px;
   }
 }
