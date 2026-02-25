@@ -4,12 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Food Menu</title>
-
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"
     />
-
     <link rel="stylesheet" href="/style.css" />
   </head>
 
@@ -21,31 +19,18 @@
       />
     </div>
 
+    <!-- food-menu.html -->
     <section class="testimonial container">
       <h2 class="testimonial__title">Food Menu</h2>
-
       <div class="testimonial__swiper swiper">
         <div class="swiper-wrapper" id="menu-wrapper"></div>
         <div class="swiper-pagination"></div>
       </div>
     </section>
-
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <script src="app.js"></script>
-
     <script>
       loadMenu("food");
-
-      const swiperTestimonial = new Swiper(".testimonial__swiper", {
-        slidesPerView: 1,
-        spaceBetween: 20,
-        centeredSlides: true,
-        grabCursor: true,
-        pagination: {
-          el: ".swiper-pagination",
-          clickable: true,
-        },
-      });
     </script>
   </body>
 </html>
