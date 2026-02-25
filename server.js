@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// ================= MULTER (temp storage) =================
+// ================= MULTER =================
 const upload = multer({ dest: "tmp/" });
 
 // ================= CREATE TABLE =================
@@ -80,8 +80,7 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
       ],
     );
 
-    // Түр файл устгах
-    fs.unlinkSync(req.file.path);
+    fs.unlinkSync(req.file.path); // түр файл устгах
 
     res.json({ success: true });
   } catch (err) {
