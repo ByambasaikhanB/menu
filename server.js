@@ -88,3 +88,33 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+// ================= AUTO CREATE TABLE =================
+async function initDB() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS menu_items (
+        id SERIAL PRIMARY KEY,
+        image_url TEXT,
+        name TEXT,
+        ingredients TEXT,
+        price TEXT,
+        kcal TEXT,
+        icons TEXT,
+        category TEXT
+      );
+    `);
+
+    console.log("Table ready");
+
+    const PORT = process.env.PORT || 3000;
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("DB INIT ERROR:", err);
+    process.exit(1); // DB ажиллахгүй бол server асахгүй
+  }
+}
+
+initDB();
