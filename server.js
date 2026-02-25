@@ -1,11 +1,20 @@
+require("dotenv").config(); // Local testing-д .env уншина
 const express = require("express");
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
 const multer = require("multer");
-const path = require("path");
 const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
+const path = require("path");
 
 const app = express();
+
+// ================= CLOUDINARY CONFIG =================
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
 
 // ================= DATABASE =================
 const pool = new Pool({
@@ -18,17 +27,8 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// ================= UPLOAD FOLDER =================
-const uploadPath = path.join(__dirname, "public/uploads");
-if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
-
-// ================= MULTER =================
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadPath),
-  filename: (req, file, cb) =>
-    cb(null, Date.now() + path.extname(file.originalname)),
-});
-const upload = multer({ storage });
+// ================= MULTER (temp storage) =================
+const upload = multer({ dest: "tmp/" });
 
 // ================= CREATE TABLE =================
 async function initDB() {
@@ -56,18 +56,34 @@ initDB();
 // ================= ADD MENU =================
 app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
-    const { name, ingredients, price, kcal, icons } = req.body;
-    const category = req.body.category?.toLowerCase() || "food";
+    const { name, ingredients, price, kcal, icons, category } = req.body;
 
     if (!req.file) return res.status(400).json({ error: "Image required" });
-    const image_url = "/uploads/" + req.file.filename;
+
+    // Cloudinary-д upload хийх
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "menu_items",
+    });
+    const image_url = result.secure_url;
 
     await pool.query(
       `INSERT INTO menu_items
        (image_url, name, ingredients, price, kcal, icons, category)
        VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-      [image_url, name, ingredients, price, kcal, icons, category],
+      [
+        image_url,
+        name,
+        ingredients || null,
+        price,
+        kcal || null,
+        icons || null,
+        category?.toLowerCase() || "food",
+      ],
     );
+
+    // Түр файл устгах
+    fs.unlinkSync(req.file.path);
+
     res.json({ success: true });
   } catch (err) {
     console.error("INSERT ERROR:", err);
