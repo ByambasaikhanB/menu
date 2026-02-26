@@ -1,12 +1,11 @@
-// server.js
-
+// ================= IMPORTS =================
 const express = require("express");
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
 const multer = require("multer");
 const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
-require("dotenv").config(); // .env файлыг ашиглах бол
+require("dotenv").config();
 
 const app = express();
 
@@ -54,71 +53,66 @@ async function initDB() {
 }
 initDB();
 
-// ================= ADD MENU =================
+// ======================================================
+// ================= ADD MENU ===========================
+// ======================================================
+
 app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
-      console.error("UPLOAD ERROR: No file uploaded");
       return res.status(400).json({ success: false, error: "Image required" });
     }
 
-    console.log("File received:", req.file.originalname, req.file.path);
+    let { name, ingredients, price, kcal, icons, category } = req.body;
 
-    // Cloudinary upload
+    // ===== VALIDATION =====
+    if (!name || !price) {
+      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: "Name and Price required" });
+    }
+
+    // ===== AUTO FORMAT =====
+    name = name ? name.toUpperCase() : null;
+    ingredients = ingredients ? ingredients.toUpperCase() : null;
+    category = category ? category.toLowerCase() : "food";
+    kcal = kcal ? kcal : null;
+    icons = icons ? icons : null;
+
+    // ===== CLOUDINARY UPLOAD =====
     let image_url;
     try {
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "menu_items",
       });
       image_url = result.secure_url;
-      console.log("Cloudinary upload success:", image_url);
-    } catch (cloudErr) {
-      console.error("CLOUDINARY ERROR:", cloudErr);
+    } catch (err) {
       if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-      return res
-        .status(500)
-        .json({ success: false, error: "Cloudinary upload failed" });
+      return res.status(500).json({ error: "Cloudinary upload failed" });
     }
 
-    // DB insert
-    const { name, ingredients, price, kcal, icons, category } = req.body;
+    // ===== DB INSERT =====
+    const result = await pool.query(
+      `INSERT INTO menu_items
+       (image_url, name, ingredients, price, kcal, icons, category)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)
+       RETURNING *`,
+      [image_url, name, ingredients, price, kcal, icons, category],
+    );
 
-    try {
-      const query = `
-        INSERT INTO menu_items
-        (image_url, name, ingredients, price, kcal, icons, category)
-        VALUES ($1,$2,$3,$4,$5,$6,$7)
-        RETURNING *;
-      `;
-      const values = [
-        image_url,
-        name,
-        ingredients || null,
-        price,
-        kcal || null,
-        icons || null,
-        category?.toLowerCase() || "food",
-      ];
+    if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
 
-      const result = await pool.query(query, values);
-      console.log("DB insert success:", result.rows[0]);
-
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-
-      res.json({ success: true, item: result.rows[0] });
-    } catch (dbErr) {
-      console.error("DB INSERT ERROR:", dbErr);
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-      res.status(500).json({ success: false, error: "Database insert failed" });
-    }
+    res.json({ success: true, item: result.rows[0] });
   } catch (err) {
-    console.error("UNEXPECTED ERROR:", err);
+    console.error("ADD MENU ERROR:", err);
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    res.status(500).json({ success: false, error: "Unexpected server error" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// ================= GET ALL MENU =================
+// ======================================================
+// ================= GET ALL MENU =======================
+// ======================================================
+
 app.get("/menu", async (req, res) => {
   try {
     const result = await pool.query(
@@ -131,13 +125,15 @@ app.get("/menu", async (req, res) => {
   }
 });
 
-// ================= GET MENU BY CATEGORY =================
+// ======================================================
+// ================= GET BY CATEGORY ====================
+// ======================================================
+
 app.get("/menu/:category", async (req, res) => {
-  const { category } = req.params;
   try {
     const result = await pool.query(
       "SELECT * FROM menu_items WHERE category=$1 ORDER BY id DESC",
-      [category.toLowerCase()],
+      [req.params.category.toLowerCase()],
     );
     res.json(result.rows);
   } catch (err) {
@@ -146,25 +142,38 @@ app.get("/menu/:category", async (req, res) => {
   }
 });
 
-// ================= UPDATE MENU =================
+// ======================================================
+// ================= UPDATE MENU ========================
+// ======================================================
+
 app.put("/menu/:id", async (req, res) => {
-  const { id } = req.params;
-  const { name, ingredients, price, kcal, icons, category } = req.body;
   try {
+    const { id } = req.params;
+    let { name, ingredients, price, kcal, icons, category } = req.body;
+
+    if (!name || !price) {
+      return res.status(400).json({ error: "Name and Price required" });
+    }
+
+    // ===== AUTO FORMAT =====
+    name = name ? name.toUpperCase() : null;
+    ingredients = ingredients ? ingredients.toUpperCase() : null;
+    category = category ? category.toLowerCase() : null;
+    kcal = kcal ? kcal : null;
+    icons = icons ? icons : null;
+
     await pool.query(
       `UPDATE menu_items
-       SET name=$1, ingredients=$2, price=$3, kcal=$4, icons=$5, category=$6
+       SET name=$1,
+           ingredients=$2,
+           price=$3,
+           kcal=$4,
+           icons=$5,
+           category=$6
        WHERE id=$7`,
-      [
-        name.toUpperCase(),
-        ingredients.toUpperCase(),
-        price,
-        kcal,
-        icons,
-        category.toLowerCase(),
-        id,
-      ],
+      [name, ingredients, price, kcal, icons, category, id],
     );
+
     res.json({ success: true });
   } catch (err) {
     console.error("UPDATE ERROR:", err);
@@ -172,11 +181,13 @@ app.put("/menu/:id", async (req, res) => {
   }
 });
 
-// ================= DELETE MENU =================
+// ======================================================
+// ================= DELETE MENU ========================
+// ======================================================
+
 app.delete("/menu/:id", async (req, res) => {
-  const { id } = req.params;
   try {
-    await pool.query("DELETE FROM menu_items WHERE id=$1", [id]);
+    await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
     res.json({ success: true });
   } catch (err) {
     console.error("DELETE ERROR:", err);
