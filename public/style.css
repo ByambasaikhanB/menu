@@ -148,7 +148,7 @@ body::before {
 }
 
 /* RESPONSIVE */
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 430px) {
   .testimonial__card {
     width: 100%;
   }
