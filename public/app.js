@@ -26,7 +26,9 @@ async function loadMenu(category) {
                 <span class="testimonial__price">${Number(item.price)}₮</span>
                 <span class="testimonial__icons">${item.icons || ""}</span>
               </div>
-              <span class="testimonial__kcal">${item.kcal || ""} kcal</span>
+              <span class="testimonial__kcal">
+  ${item.kcal ? item.kcal + " kcal" : ""}
+</span>
             </div>
           </div>
         </div>
