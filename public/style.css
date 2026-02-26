@@ -18,7 +18,8 @@ body {
   background-color: var(--body-color);
   margin: 0;
   position: relative;
-  overflow: hidden;
+  overflow-x: auto; /* mobile-д хөндлөн scroll зөвшөөрөх */
+  overflow-y: auto;
 }
 
 #nav-img img {
@@ -56,7 +57,6 @@ body::before {
 }
 
 /* CARD */
-
 .testimonial__card {
   position: relative;
   border-radius: 10px;
@@ -66,6 +66,7 @@ body::before {
   transition: transform 0.3s ease;
   cursor: pointer;
   display: inline-block; /* original image size */
+  width: 342px; /* desktop width */
 }
 
 .testimonial__card:hover {
@@ -74,10 +75,9 @@ body::before {
 
 .testimonial__img {
   display: block;
-  width: 342px; /* original width */
-  height: 500px; /* original height */
-  max-width: 100%;
-  max-height: 100%;
+  width: 342px; /* desktop width */
+  height: 500px; /* desktop height */
+  object-fit: cover;
 }
 
 /* Overlay мэдээлэл */
@@ -148,49 +148,23 @@ body::before {
 }
 
 /* RESPONSIVE */
+
+/* Mobile-д desktop шиг card харагдуулах */
 @media screen and (max-width: 767px) {
   .testimonial__card {
-    width: 100%;
-  }
-}
-
-@media screen and (min-width: 768px) {
-  .testimonial__card {
-    width: auto;
-  }
-}
-/* FIX: 390px – 767px */
-@media screen and (min-width: 390px) and (max-width: 767px) {
-  body {
-    overflow-x: hidden; /* зөвхөн хөндлөн scroll хаана */
-    overflow-y: auto; /* босоо scroll хэвийн */
-  }
-
-  .testimonial__card {
-    width: 100%;
-    display: block; /* inline-block биш болгоно */
-    margin: 0 auto;
+    width: 342px; /* desktop width */
+    display: inline-block; /* inline-block хэвээр */
   }
 
   .testimonial__img {
-    width: 100%;
-    height: auto; /* fixed 500px-ийг болиулна */
-    object-fit: cover;
+    width: 342px;
+    height: 500px;
   }
+}
 
-  .testimonial__overlay {
-    padding: 10px;
-  }
-
-  .testimonial__price {
-    font-size: 1.5rem; /* жижиг дэлгэц дээр багасгана */
-  }
-
-  .testimonial__icons {
-    font-size: 1.2rem;
-  }
-
-  .testimonial__kcal {
-    font-size: 0.8rem;
+/* Tablet болон desktop хэвээр */
+@media screen and (min-width: 768px) {
+  .testimonial__card {
+    width: auto;
   }
 }
