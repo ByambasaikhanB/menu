@@ -27,7 +27,11 @@ async function loadMenu(category) {
                 <span class="testimonial__icons">${item.icons || ""}</span>
               </div>
               <span class="testimonial__kcal">
-  ${item.kcal ? item.kcal + " kcal" : ""}
+  ${
+    item.kcal && item.kcal.trim() !== ""
+      ? `<span class="testimonial__kcal">${item.kcal} kcal</span>`
+      : ""
+  }
 </span>
             </div>
           </div>
