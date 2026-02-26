@@ -148,7 +148,7 @@ body::before {
 }
 
 /* RESPONSIVE */
-@media screen and (max-width: 430px) {
+@media screen and (max-width: 767px) {
   .testimonial__card {
     width: 100%;
   }
@@ -157,5 +157,40 @@ body::before {
 @media screen and (min-width: 768px) {
   .testimonial__card {
     width: auto;
+  }
+}
+/* FIX: 390px – 767px */
+@media screen and (min-width: 390px) and (max-width: 767px) {
+  body {
+    overflow-x: hidden; /* зөвхөн хөндлөн scroll хаана */
+    overflow-y: auto; /* босоо scroll хэвийн */
+  }
+
+  .testimonial__card {
+    width: 100%;
+    display: block; /* inline-block биш болгоно */
+    margin: 0 auto;
+  }
+
+  .testimonial__img {
+    width: 100%;
+    height: auto; /* fixed 500px-ийг болиулна */
+    object-fit: cover;
+  }
+
+  .testimonial__overlay {
+    padding: 10px;
+  }
+
+  .testimonial__price {
+    font-size: 1.5rem; /* жижиг дэлгэц дээр багасгана */
+  }
+
+  .testimonial__icons {
+    font-size: 1.2rem;
+  }
+
+  .testimonial__kcal {
+    font-size: 0.8rem;
   }
 }
