@@ -155,7 +155,15 @@ app.put("/menu/:id", async (req, res) => {
       `UPDATE menu_items
        SET name=$1, ingredients=$2, price=$3, kcal=$4, icons=$5, category=$6
        WHERE id=$7`,
-      [name, ingredients, price, kcal, icons, category.toLowerCase(), id],
+      [
+        name.toUpperCase(),
+        ingredients.toUpperCase(),
+        price,
+        kcal,
+        icons,
+        category.toLowerCase(),
+        id,
+      ],
     );
     res.json({ success: true });
   } catch (err) {
