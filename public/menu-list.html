@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menu List</title>
+    <link rel="stylesheet" href="list.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">Menu List</h1>
+      <div id="menu-list" class="menu-list"></div>
+    </div>
+
+    <script>
+      async function loadList() {
+        const res = await fetch("/menu/list");
+        const data = await res.json();
+
+        const container = document.getElementById("menu-list");
+        container.innerHTML = "";
+
+        data.forEach((item) => {
+          container.innerHTML += `
+      <div class="menu-item">
+        <div class="menu-name">${item.name}</div>
+        <div class="menu-price">${item.price}₮</div>
+      </div>
+    `;
+        });
+      }
+
+      loadList();
+    </script>
+  </body>
+</html>
