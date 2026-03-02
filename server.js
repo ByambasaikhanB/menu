@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const upload = multer({ dest: "tmp/" });
 
-// ================= SAFE DB INIT =================
+// ================= CREATE TABLE =================
 async function initDB() {
   try {
     await pool.query(`
@@ -43,12 +43,6 @@ async function initDB() {
       );
     `);
 
-    // sort_order column байхгүй бол нэмнэ
-    await pool.query(`
-      ALTER TABLE menu_items
-      ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 0;
-    `);
-
     console.log("Database ready");
   } catch (err) {
     console.error("DB INIT ERROR:", err);
@@ -60,31 +54,29 @@ initDB();
 // ================= API ROUTES ====================
 // =================================================
 
-// GET ALL
+// GET ALL → ID ASC (1 хамгийн эхэнд)
 app.get("/menu", async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM menu_items ORDER BY sort_order ASC, id DESC",
-    );
+    const result = await pool.query("SELECT * FROM menu_items ORDER BY id ASC");
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error("GET ALL ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET BY CATEGORY
+// GET BY CATEGORY → ID ASC
 app.get("/menu/:category", async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT * FROM menu_items
        WHERE LOWER(category)=LOWER($1)
-       ORDER BY sort_order ASC, id DESC`,
+       ORDER BY id ASC`,
       [req.params.category],
     );
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error("GET CATEGORY ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -92,8 +84,7 @@ app.get("/menu/:category", async (req, res) => {
 // ADD MENU
 app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
-    let { name, ingredients, price, kcal, icons, category, sort_order } =
-      req.body;
+    let { name, ingredients, price, kcal, icons, category } = req.body;
 
     if (!name || !price || !category) {
       return res.status(400).json({ success: false, error: "Missing fields" });
@@ -115,8 +106,8 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO menu_items
-       (image_url,name,ingredients,price,kcal,icons,category,sort_order)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+       (image_url,name,ingredients,price,kcal,icons,category)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)
        RETURNING *`,
       [
         image_url,
@@ -126,13 +117,12 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
         kcal || null,
         icons || null,
         category,
-        sort_order || 0,
       ],
     );
 
     res.json({ success: true, item: result.rows[0] });
   } catch (err) {
-    console.error(err);
+    console.error("ADD ERROR:", err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -141,8 +131,7 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
 app.put("/menu/:id", upload.single("image"), async (req, res) => {
   try {
     const { id } = req.params;
-    let { name, ingredients, price, kcal, icons, category, sort_order } =
-      req.body;
+    let { name, ingredients, price, kcal, icons, category } = req.body;
 
     name = name.toUpperCase();
     ingredients = ingredients ? ingredients.toUpperCase() : null;
@@ -167,9 +156,8 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
              kcal=$4,
              icons=$5,
              category=$6,
-             sort_order=$7,
-             image_url=$8
-         WHERE id=$9`,
+             image_url=$7
+         WHERE id=$8`,
         [
           name,
           ingredients,
@@ -177,7 +165,6 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
           kcal || null,
           icons || null,
           category,
-          sort_order || 0,
           image_url,
           id,
         ],
@@ -190,25 +177,15 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
              price=$3,
              kcal=$4,
              icons=$5,
-             category=$6,
-             sort_order=$7
-         WHERE id=$8`,
-        [
-          name,
-          ingredients,
-          price,
-          kcal || null,
-          icons || null,
-          category,
-          sort_order || 0,
-          id,
-        ],
+             category=$6
+         WHERE id=$7`,
+        [name, ingredients, price, kcal || null, icons || null, category, id],
       );
     }
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error("UPDATE ERROR:", err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -219,7 +196,7 @@ app.delete("/menu/:id", async (req, res) => {
     await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error("DELETE ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -227,7 +204,7 @@ app.delete("/menu/:id", async (req, res) => {
 // ================= STATIC =================
 app.use(express.static("public"));
 
-// ================= GLOBAL ERROR HANDLER =================
+// ================= GLOBAL ERROR =================
 app.use((err, req, res, next) => {
   console.error("GLOBAL ERROR:", err);
   res.status(500).json({ error: err.message });
