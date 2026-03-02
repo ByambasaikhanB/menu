@@ -69,7 +69,13 @@ async function loadMenu() {
       return;
     }
 
-    const data = await res.json();
+    let data = await res.json();
+
+    // ==========================
+    // Гараар дараалал удирдах
+    // id их → эхэнд
+    data.sort((a, b) => b.id - a.id);
+    // ==========================
 
     data.forEach((item) => {
       const row = document.createElement("tr");
