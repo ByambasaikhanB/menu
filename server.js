@@ -27,21 +27,32 @@ app.use(express.urlencoded({ extended: true }));
 
 const upload = multer({ dest: "tmp/" });
 
-// ================= CREATE TABLE =================
+// ================= SAFE DB INIT =================
 async function initDB() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS menu_items (
-      id SERIAL PRIMARY KEY,
-      image_url TEXT,
-      name TEXT NOT NULL,
-      ingredients TEXT,
-      price TEXT NOT NULL,
-      kcal TEXT,
-      icons TEXT,
-      category TEXT,
-      sort_order INT DEFAULT 0
-    );
-  `);
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS menu_items (
+        id SERIAL PRIMARY KEY,
+        image_url TEXT,
+        name TEXT NOT NULL,
+        ingredients TEXT,
+        price TEXT NOT NULL,
+        kcal TEXT,
+        icons TEXT,
+        category TEXT
+      );
+    `);
+
+    // sort_order column байхгүй бол нэмнэ
+    await pool.query(`
+      ALTER TABLE menu_items
+      ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 0;
+    `);
+
+    console.log("Database ready");
+  } catch (err) {
+    console.error("DB INIT ERROR:", err);
+  }
 }
 initDB();
 
@@ -49,23 +60,33 @@ initDB();
 // ================= API ROUTES ====================
 // =================================================
 
-// GET ALL (гараар удирдах дарааллаар)
+// GET ALL
 app.get("/menu", async (req, res) => {
-  const result = await pool.query(
-    "SELECT * FROM menu_items ORDER BY sort_order ASC, id DESC",
-  );
-  res.json(result.rows);
+  try {
+    const result = await pool.query(
+      "SELECT * FROM menu_items ORDER BY sort_order ASC, id DESC",
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // GET BY CATEGORY
 app.get("/menu/:category", async (req, res) => {
-  const result = await pool.query(
-    `SELECT * FROM menu_items
-     WHERE LOWER(category)=LOWER($1)
-     ORDER BY sort_order ASC, id DESC`,
-    [req.params.category],
-  );
-  res.json(result.rows);
+  try {
+    const result = await pool.query(
+      `SELECT * FROM menu_items
+       WHERE LOWER(category)=LOWER($1)
+       ORDER BY sort_order ASC, id DESC`,
+      [req.params.category],
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ADD MENU
@@ -73,6 +94,10 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
     let { name, ingredients, price, kcal, icons, category, sort_order } =
       req.body;
+
+    if (!name || !price || !category) {
+      return res.status(400).json({ success: false, error: "Missing fields" });
+    }
 
     name = name.toUpperCase();
     ingredients = ingredients ? ingredients.toUpperCase() : null;
@@ -108,11 +133,11 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
     res.json({ success: true, item: result.rows[0] });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// UPDATE MENU
+// UPDATE
 app.put("/menu/:id", upload.single("image"), async (req, res) => {
   try {
     const { id } = req.params;
@@ -184,18 +209,29 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
 // DELETE
 app.delete("/menu/:id", async (req, res) => {
-  await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
-  res.json({ success: true });
+  try {
+    await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ================= STATIC =================
 app.use(express.static("public"));
+
+// ================= GLOBAL ERROR HANDLER =================
+app.use((err, req, res, next) => {
+  console.error("GLOBAL ERROR:", err);
+  res.status(500).json({ error: err.message });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Server running on port " + PORT));

@@ -5,16 +5,18 @@ const imagePreview = document.getElementById("imagePreview");
 // ================= IMAGE PREVIEW =================
 imageInput.addEventListener("change", () => {
   const file = imageInput.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imagePreview.src = e.target.result;
-      imagePreview.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-  } else {
+
+  if (!file) {
     imagePreview.style.display = "none";
+    return;
   }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imagePreview.src = e.target.result;
+    imagePreview.style.display = "block";
+  };
+  reader.readAsDataURL(file);
 });
 
 // ================= ADD MENU =================
@@ -23,20 +25,32 @@ form.addEventListener("submit", async (e) => {
 
   const formData = new FormData(form);
 
-  const res = await fetch("/add-menu", {
-    method: "POST",
-    body: formData,
-  });
+  try {
+    const res = await fetch("/add-menu", {
+      method: "POST",
+      body: formData,
+    });
 
-  const result = await res.json();
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("SERVER ERROR:", text);
+      alert("Server error гарлаа. Console шалга.");
+      return;
+    }
 
-  if (result.success) {
-    alert("Амжилттай нэмэгдлээ!");
-    form.reset();
-    imagePreview.style.display = "none";
-    loadMenu();
-  } else {
-    alert("Алдаа гарлаа");
+    const result = await res.json();
+
+    if (result.success) {
+      alert("Амжилттай нэмэгдлээ!");
+      form.reset();
+      imagePreview.style.display = "none";
+      loadMenu();
+    } else {
+      alert(result.error || "Алдаа гарлаа");
+    }
+  } catch (err) {
+    console.error("FETCH ERROR:", err);
+    alert("Network error гарлаа");
   }
 });
 
@@ -45,56 +59,70 @@ async function loadMenu() {
   const tbody = document.querySelector("#menuTable tbody");
   tbody.innerHTML = "";
 
-  const res = await fetch("/menu");
-  const data = await res.json();
+  try {
+    const res = await fetch("/menu");
 
-  data.forEach((item) => {
-    const row = document.createElement("tr");
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("LOAD ERROR:", text);
+      alert("Menu ачааллах үед алдаа гарлаа");
+      return;
+    }
 
-    row.innerHTML = `
-      <td>${item.id}</td>
-      <td contenteditable="true">${item.sort_order || 0}</td>
-      <td>
-        ${item.image_url ? `<img src="${item.image_url}" width="60"><br>` : "-"}
-        <input type="file" class="imageInput" accept="image/*">
-        <img class="previewImg" style="display:none;width:60px;margin-top:5px;">
-      </td>
-      <td contenteditable="true">${item.name}</td>
-      <td contenteditable="true">${item.ingredients || ""}</td>
-      <td contenteditable="true">${item.price}</td>
-      <td contenteditable="true">${item.kcal || ""}</td>
-      <td contenteditable="true">${item.icons || ""}</td>
-      <td contenteditable="true">${item.category}</td>
-      <td>
-        <button onclick="updateItem(${item.id}, this)">Save</button>
-        <button onclick="deleteItem(${item.id})">Delete</button>
-      </td>
-    `;
+    const data = await res.json();
 
-    const imageInputRow = row.querySelector(".imageInput");
-    const previewImg = row.querySelector(".previewImg");
+    data.forEach((item) => {
+      const row = document.createElement("tr");
 
-    imageInputRow.addEventListener("change", () => {
-      const file = imageInputRow.files[0];
-      if (file) {
+      row.innerHTML = `
+        <td>${item.id}</td>
+        <td contenteditable="true">${item.sort_order || 0}</td>
+        <td>
+          ${item.image_url ? `<img src="${item.image_url}" width="60"><br>` : "-"}
+          <input type="file" class="imageInput" accept="image/*">
+          <img class="previewImg" style="display:none;width:60px;margin-top:5px;">
+        </td>
+        <td contenteditable="true">${item.name}</td>
+        <td contenteditable="true">${item.ingredients || ""}</td>
+        <td contenteditable="true">${item.price}</td>
+        <td contenteditable="true">${item.kcal || ""}</td>
+        <td contenteditable="true">${item.icons || ""}</td>
+        <td contenteditable="true">${item.category}</td>
+        <td>
+          <button onclick="updateItem(${item.id}, this)">Save</button>
+          <button onclick="deleteItem(${item.id})">Delete</button>
+        </td>
+      `;
+
+      // IMAGE PREVIEW (ROW)
+      const imageInputRow = row.querySelector(".imageInput");
+      const previewImg = row.querySelector(".previewImg");
+
+      imageInputRow.addEventListener("change", () => {
+        const file = imageInputRow.files[0];
+        if (!file) return;
+
         const reader = new FileReader();
         reader.onload = (e) => {
           previewImg.src = e.target.result;
           previewImg.style.display = "block";
         };
         reader.readAsDataURL(file);
-      }
-    });
+      });
 
-    tbody.appendChild(row);
-  });
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("LOAD FETCH ERROR:", err);
+    alert("Network error гарлаа");
+  }
 }
 
 loadMenu();
 
 // ================= UPDATE =================
 async function updateItem(id, btn) {
-  const row = btn.parentElement.parentElement;
+  const row = btn.closest("tr");
   const imageInput = row.querySelector(".imageInput");
 
   const formData = new FormData();
@@ -111,18 +139,46 @@ async function updateItem(id, btn) {
     formData.append("image", imageInput.files[0]);
   }
 
-  await fetch(`/menu/${id}`, {
-    method: "PUT",
-    body: formData,
-  });
+  try {
+    const res = await fetch(`/menu/${id}`, {
+      method: "PUT",
+      body: formData,
+    });
 
-  loadMenu();
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("UPDATE ERROR:", text);
+      alert("Update хийх үед алдаа гарлаа");
+      return;
+    }
+
+    alert("Амжилттай хадгалагдлаа");
+    loadMenu();
+  } catch (err) {
+    console.error("UPDATE FETCH ERROR:", err);
+    alert("Network error");
+  }
 }
 
 // ================= DELETE =================
 async function deleteItem(id) {
-  if (confirm("Delete this item?")) {
-    await fetch(`/menu/${id}`, { method: "DELETE" });
+  if (!confirm("Delete this item?")) return;
+
+  try {
+    const res = await fetch(`/menu/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("DELETE ERROR:", text);
+      alert("Delete үед алдаа гарлаа");
+      return;
+    }
+
     loadMenu();
+  } catch (err) {
+    console.error("DELETE FETCH ERROR:", err);
+    alert("Network error");
   }
 }
