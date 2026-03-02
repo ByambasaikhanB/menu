@@ -77,9 +77,7 @@ app.get("/menu", async (req, res) => {
 app.get("/menu/:category", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT * FROM menu_items
-       WHERE LOWER(category)=LOWER($1)
-       ORDER BY sort_order ASC, id DESC`,
+      "SELECT * FROM menu_items ORDER BY sort_order ASC, id ASC",
       [req.params.category],
     );
     res.json(result.rows);
