@@ -8,25 +8,25 @@ require("dotenv").config();
 
 const app = express();
 
-// ================= CLOUDINARY =================
+// Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-// ================= DATABASE =================
+// DB
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
-// ================= MIDDLEWARE =================
+// Middleware
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 const upload = multer({ dest: "tmp/" });
 
-// ================= INIT DB =================
+// Init DB
 async function initDB() {
   try {
     await pool.query(`
@@ -39,7 +39,7 @@ async function initDB() {
         kcal TEXT,
         icons TEXT,
         category TEXT
-      );
+      )
     `);
     console.log("DB ready");
   } catch (err) {
@@ -48,13 +48,10 @@ async function initDB() {
 }
 initDB();
 
-// ================= GET ALL =================
 // GET ALL
 app.get("/menu", async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM menu_items ORDER BY sort_order ASC, id ASC",
-    );
+    const result = await pool.query("SELECT * FROM menu_items ORDER BY id ASC");
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -62,24 +59,11 @@ app.get("/menu", async (req, res) => {
   }
 });
 
-// ================= GET BY CATEGORY =================
-app.get("/menu/:category", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM menu_items WHERE LOWER(category)=$1 ORDER BY id ASC",
-      [req.params.category],
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ================= ADD MENU =================
+// ADD
 app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
     let { name, ingredients, price, kcal, icons, category } = req.body;
+
     if (!name || !price || !category)
       return res.status(400).json({ success: false, error: "Missing fields" });
 
@@ -117,7 +101,7 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
   }
 });
 
-// ================= UPDATE =================
+// UPDATE
 app.put("/menu/:id", upload.single("image"), async (req, res) => {
   try {
     const { id } = req.params;
@@ -136,7 +120,6 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
       fs.unlinkSync(req.file.path);
     }
 
-    // Зураг байгаа эсэхийг шалгаж query
     if (image_url) {
       await pool.query(
         `UPDATE menu_items
@@ -169,7 +152,7 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
   }
 });
 
-// ================= DELETE =================
+// DELETE
 app.delete("/menu/:id", async (req, res) => {
   try {
     await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
@@ -180,14 +163,8 @@ app.delete("/menu/:id", async (req, res) => {
   }
 });
 
-// ================= STATIC =================
+// Static
 app.use(express.static("public"));
 
-// ================= GLOBAL ERROR =================
-app.use((err, req, res, next) => {
-  console.error("GLOBAL ERROR:", err);
-  res.status(500).json({ error: err.message });
-});
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Server running on port " + PORT));
+app.listen(PORT, () => console.log("Server running on " + PORT));
