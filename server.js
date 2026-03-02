@@ -38,7 +38,8 @@ async function initDB() {
       price TEXT NOT NULL,
       kcal TEXT,
       icons TEXT,
-      category TEXT
+      category TEXT,
+      sort_order INT DEFAULT 0
     );
   `);
 }
@@ -48,25 +49,30 @@ initDB();
 // ================= API ROUTES ====================
 // =================================================
 
-// GET ALL
+// GET ALL (гараар удирдах дарааллаар)
 app.get("/menu", async (req, res) => {
-  const result = await pool.query("SELECT * FROM menu_items ORDER BY id DESC");
+  const result = await pool.query(
+    "SELECT * FROM menu_items ORDER BY sort_order ASC, id DESC",
+  );
   res.json(result.rows);
 });
 
-// GET BY CATEGORY (CASE INSENSITIVE)
+// GET BY CATEGORY
 app.get("/menu/:category", async (req, res) => {
   const result = await pool.query(
-    "SELECT * FROM menu_items WHERE LOWER(category)=LOWER($1) ORDER BY id DESC",
+    `SELECT * FROM menu_items
+     WHERE LOWER(category)=LOWER($1)
+     ORDER BY sort_order ASC, id DESC`,
     [req.params.category],
   );
   res.json(result.rows);
 });
 
-// ADD
+// ADD MENU
 app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
-    let { name, ingredients, price, kcal, icons, category } = req.body;
+    let { name, ingredients, price, kcal, icons, category, sort_order } =
+      req.body;
 
     name = name.toUpperCase();
     ingredients = ingredients ? ingredients.toUpperCase() : null;
@@ -84,8 +90,8 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO menu_items
-       (image_url,name,ingredients,price,kcal,icons,category)
-       VALUES ($1,$2,$3,$4,$5,$6,$7)
+       (image_url,name,ingredients,price,kcal,icons,category,sort_order)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
        RETURNING *`,
       [
         image_url,
@@ -95,6 +101,7 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
         kcal || null,
         icons || null,
         category,
+        sort_order || 0,
       ],
     );
 
@@ -105,11 +112,12 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
   }
 });
 
-// UPDATE
+// UPDATE MENU
 app.put("/menu/:id", upload.single("image"), async (req, res) => {
   try {
     const { id } = req.params;
-    let { name, ingredients, price, kcal, icons, category } = req.body;
+    let { name, ingredients, price, kcal, icons, category, sort_order } =
+      req.body;
 
     name = name.toUpperCase();
     ingredients = ingredients ? ingredients.toUpperCase() : null;
@@ -128,8 +136,37 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
     if (image_url) {
       await pool.query(
         `UPDATE menu_items
-         SET name=$1, ingredients=$2, price=$3,
-             kcal=$4, icons=$5, category=$6, image_url=$7
+         SET name=$1,
+             ingredients=$2,
+             price=$3,
+             kcal=$4,
+             icons=$5,
+             category=$6,
+             sort_order=$7,
+             image_url=$8
+         WHERE id=$9`,
+        [
+          name,
+          ingredients,
+          price,
+          kcal || null,
+          icons || null,
+          category,
+          sort_order || 0,
+          image_url,
+          id,
+        ],
+      );
+    } else {
+      await pool.query(
+        `UPDATE menu_items
+         SET name=$1,
+             ingredients=$2,
+             price=$3,
+             kcal=$4,
+             icons=$5,
+             category=$6,
+             sort_order=$7
          WHERE id=$8`,
         [
           name,
@@ -138,17 +175,9 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
           kcal || null,
           icons || null,
           category,
-          image_url,
+          sort_order || 0,
           id,
         ],
-      );
-    } else {
-      await pool.query(
-        `UPDATE menu_items
-         SET name=$1, ingredients=$2, price=$3,
-             kcal=$4, icons=$5, category=$6
-         WHERE id=$7`,
-        [name, ingredients, price, kcal || null, icons || null, category, id],
       );
     }
 
@@ -165,7 +194,7 @@ app.delete("/menu/:id", async (req, res) => {
   res.json({ success: true });
 });
 
-// ================= STATIC LAST =================
+// ================= STATIC =================
 app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;

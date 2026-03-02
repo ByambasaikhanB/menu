@@ -20,6 +20,7 @@ imageInput.addEventListener("change", () => {
 // ================= ADD MENU =================
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const formData = new FormData(form);
 
   const res = await fetch("/add-menu", {
@@ -35,7 +36,7 @@ form.addEventListener("submit", async (e) => {
     imagePreview.style.display = "none";
     loadMenu();
   } else {
-    alert(result.error || "Алдаа гарлаа");
+    alert("Алдаа гарлаа");
   }
 });
 
@@ -52,6 +53,7 @@ async function loadMenu() {
 
     row.innerHTML = `
       <td>${item.id}</td>
+      <td contenteditable="true">${item.sort_order || 0}</td>
       <td>
         ${item.image_url ? `<img src="${item.image_url}" width="60"><br>` : "-"}
         <input type="file" class="imageInput" accept="image/*">
@@ -69,7 +71,6 @@ async function loadMenu() {
       </td>
     `;
 
-    // LIVE PREVIEW
     const imageInputRow = row.querySelector(".imageInput");
     const previewImg = row.querySelector(".previewImg");
 
@@ -98,12 +99,13 @@ async function updateItem(id, btn) {
 
   const formData = new FormData();
 
-  formData.append("name", row.children[2].innerText);
-  formData.append("ingredients", row.children[3].innerText);
-  formData.append("price", row.children[4].innerText);
-  formData.append("kcal", row.children[5].innerText);
-  formData.append("icons", row.children[6].innerText);
-  formData.append("category", row.children[7].innerText);
+  formData.append("sort_order", row.children[1].innerText.trim());
+  formData.append("name", row.children[3].innerText.trim());
+  formData.append("ingredients", row.children[4].innerText.trim());
+  formData.append("price", row.children[5].innerText.trim());
+  formData.append("kcal", row.children[6].innerText.trim());
+  formData.append("icons", row.children[7].innerText.trim());
+  formData.append("category", row.children[8].innerText.trim());
 
   if (imageInput.files[0]) {
     formData.append("image", imageInput.files[0]);

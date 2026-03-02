@@ -14,7 +14,6 @@
 
       <img
         id="imagePreview"
-        src=""
         style="
           display: none;
           width: 150px;
@@ -36,6 +35,13 @@
       <input type="number" name="kcal" placeholder="Kcal" />
       <input type="text" name="icons" placeholder="Icons" />
 
+      <!-- 🔥 ШИНЭ -->
+      <input
+        type="number"
+        name="sort_order"
+        placeholder="Display Order (1,2,3...)"
+      />
+
       <select name="category" required>
         <option value="">Select category</option>
         <option value="food">Food</option>
@@ -55,6 +61,8 @@
         <thead>
           <tr>
             <th>ID</th>
+            <th>Order</th>
+            <!-- 🔥 -->
             <th>Image</th>
             <th>Name</th>
             <th>Ingredients</th>
