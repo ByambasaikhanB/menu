@@ -49,9 +49,12 @@ async function initDB() {
 initDB();
 
 // ================= GET ALL =================
+// GET ALL
 app.get("/menu", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM menu_items ORDER BY id ASC");
+    const result = await pool.query(
+      "SELECT * FROM menu_items ORDER BY sort_order ASC, id ASC",
+    );
     res.json(result.rows);
   } catch (err) {
     console.error(err);

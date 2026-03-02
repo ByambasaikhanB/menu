@@ -42,77 +42,68 @@ form.addEventListener("submit", async (e) => {
 });
 
 // LOAD MENU
+// LOAD MENU
 async function loadMenu() {
   const tbody = document.querySelector("#menuTable tbody");
   tbody.innerHTML = "";
 
-  try {
-    const res = await fetch("/menu");
-    if (!res.ok) {
-      const text = await res.text();
-      console.error(text);
-      alert("Menu ачааллахад алдаа гарлаа");
-      return;
-    }
-    const data = await res.json();
+  const res = await fetch("/menu");
+  const data = await res.json();
 
-    data.forEach((item) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${item.id}</td>
-        <td>
-          ${item.image_url ? `<img src="${item.image_url}" width="60"><br>` : "-"}
-          <input type="file" class="imageInput" accept="image/*">
-          <img class="previewImg" style="display:none;width:60px;margin-top:5px;">
-        </td>
-        <td contenteditable="true">${item.name}</td>
-        <td contenteditable="true">${item.ingredients || ""}</td>
-        <td contenteditable="true">${item.price}</td>
-        <td contenteditable="true">${item.kcal || ""}</td>
-        <td contenteditable="true">${item.icons || ""}</td>
-        <td contenteditable="true">${item.category}</td>
-        <td>
-          <button onclick="updateItem(${item.id}, this)">Save</button>
-          <button onclick="deleteItem(${item.id})">Delete</button>
-        </td>
-      `;
+  data.forEach((item) => {
+    const row = document.createElement("tr");
 
-      // IMAGE PREVIEW FOR ROW
-      const imageInputRow = row.querySelector(".imageInput");
-      const previewImg = row.querySelector(".previewImg");
-      imageInputRow.addEventListener("change", () => {
-        const file = imageInputRow.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          previewImg.src = e.target.result;
-          previewImg.style.display = "block";
-        };
-        reader.readAsDataURL(file);
-      });
+    row.innerHTML = `
+      <td>${item.id}</td>
+      <td contenteditable="true">${item.sort_order || 0}</td>
+      <td>
+        ${item.image_url ? `<img src="${item.image_url}" width="60"><br>` : "-"}
+        <input type="file" class="imageInput" accept="image/*">
+        <img class="previewImg" style="display:none;width:60px;margin-top:5px;">
+      </td>
+      <td contenteditable="true">${item.name}</td>
+      <td contenteditable="true">${item.ingredients || ""}</td>
+      <td contenteditable="true">${item.price}</td>
+      <td contenteditable="true">${item.kcal || ""}</td>
+      <td contenteditable="true">${item.icons || ""}</td>
+      <td contenteditable="true">${item.category}</td>
+      <td>
+        <button onclick="updateItem(${item.id}, this)">Save</button>
+        <button onclick="deleteItem(${item.id})">Delete</button>
+      </td>
+    `;
 
-      tbody.appendChild(row);
+    const imageInputRow = row.querySelector(".imageInput");
+    const previewImg = row.querySelector(".previewImg");
+
+    imageInputRow.addEventListener("change", () => {
+      const file = imageInputRow.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImg.src = e.target.result;
+        previewImg.style.display = "block";
+      };
+      reader.readAsDataURL(file);
     });
-  } catch (err) {
-    console.error(err);
-    alert("Network error");
-  }
+
+    tbody.appendChild(row);
+  });
 }
 
-loadMenu();
-
-// UPDATE
+// UPDATE FUNCTION
 async function updateItem(id, btn) {
   const row = btn.closest("tr");
   const imageInput = row.querySelector(".imageInput");
 
   const formData = new FormData();
-  formData.append("name", row.children[2].innerText.trim());
-  formData.append("ingredients", row.children[3].innerText.trim());
-  formData.append("price", row.children[4].innerText.trim());
-  formData.append("kcal", row.children[5].innerText.trim());
-  formData.append("icons", row.children[6].innerText.trim());
-  formData.append("category", row.children[7].innerText.trim());
+  formData.append("sort_order", row.children[1].innerText.trim());
+  formData.append("name", row.children[3].innerText.trim());
+  formData.append("ingredients", row.children[4].innerText.trim());
+  formData.append("price", row.children[5].innerText.trim());
+  formData.append("kcal", row.children[6].innerText.trim());
+  formData.append("icons", row.children[7].innerText.trim());
+  formData.append("category", row.children[8].innerText.trim());
 
   if (imageInput.files[0]) formData.append("image", imageInput.files[0]);
 
@@ -125,25 +116,6 @@ async function updateItem(id, btn) {
       return;
     }
     alert("Амжилттай хадгалагдлаа");
-    loadMenu();
-  } catch (err) {
-    console.error(err);
-    alert("Network error");
-  }
-}
-
-// DELETE
-async function deleteItem(id) {
-  if (!confirm("Delete this item?")) return;
-
-  try {
-    const res = await fetch(`/menu/${id}`, { method: "DELETE" });
-    if (!res.ok) {
-      const text = await res.text();
-      console.error(text);
-      alert("Delete алдаа гарлаа");
-      return;
-    }
     loadMenu();
   } catch (err) {
     console.error(err);
