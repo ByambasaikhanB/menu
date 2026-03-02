@@ -2,6 +2,7 @@ const form = document.getElementById("menuForm");
 const imageInput = form.querySelector('input[name="image"]');
 const imagePreview = document.getElementById("imagePreview");
 
+// ================= IMAGE PREVIEW =================
 imageInput.addEventListener("change", () => {
   const file = imageInput.files[0];
   if (file) {
@@ -16,6 +17,7 @@ imageInput.addEventListener("change", () => {
   }
 });
 
+// ================= ADD MENU =================
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const formData = new FormData(form);
@@ -37,6 +39,7 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
+// ================= LOAD MENU =================
 async function loadMenu() {
   const tbody = document.querySelector("#menuTable tbody");
   tbody.innerHTML = "";
@@ -49,9 +52,11 @@ async function loadMenu() {
 
     row.innerHTML = `
       <td>${item.id}</td>
-      <td>${
-        item.image_url ? `<img src="${item.image_url}" width="50"/>` : "-"
-      }</td>
+      <td>
+        ${item.image_url ? `<img src="${item.image_url}" width="60"><br>` : "-"}
+        <input type="file" class="imageInput" accept="image/*">
+        <img class="previewImg" style="display:none;width:60px;margin-top:5px;">
+      </td>
       <td contenteditable="true">${item.name}</td>
       <td contenteditable="true">${item.ingredients || ""}</td>
       <td contenteditable="true">${item.price}</td>
@@ -64,33 +69,55 @@ async function loadMenu() {
       </td>
     `;
 
+    // LIVE PREVIEW
+    const imageInputRow = row.querySelector(".imageInput");
+    const previewImg = row.querySelector(".previewImg");
+
+    imageInputRow.addEventListener("change", () => {
+      const file = imageInputRow.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          previewImg.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
     tbody.appendChild(row);
   });
 }
 
 loadMenu();
 
+// ================= UPDATE =================
 async function updateItem(id, btn) {
   const row = btn.parentElement.parentElement;
+  const imageInput = row.querySelector(".imageInput");
 
-  const payload = {
-    name: row.children[2].innerText,
-    ingredients: row.children[3].innerText,
-    price: row.children[4].innerText,
-    kcal: row.children[5].innerText,
-    icons: row.children[6].innerText,
-    category: row.children[7].innerText,
-  };
+  const formData = new FormData();
+
+  formData.append("name", row.children[2].innerText);
+  formData.append("ingredients", row.children[3].innerText);
+  formData.append("price", row.children[4].innerText);
+  formData.append("kcal", row.children[5].innerText);
+  formData.append("icons", row.children[6].innerText);
+  formData.append("category", row.children[7].innerText);
+
+  if (imageInput.files[0]) {
+    formData.append("image", imageInput.files[0]);
+  }
 
   await fetch(`/menu/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
   loadMenu();
 }
 
+// ================= DELETE =================
 async function deleteItem(id) {
   if (confirm("Delete this item?")) {
     await fetch(`/menu/${id}`, { method: "DELETE" });
