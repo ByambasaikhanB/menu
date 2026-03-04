@@ -74,12 +74,16 @@ app.get("/menu", async (req, res) => {
 });
 
 // GET BY CATEGORY
+// GET BY CATEGORY
 app.get("/menu/:category", async (req, res) => {
   try {
+    const { category } = req.params;
+
     const result = await pool.query(
-      "SELECT * FROM menu_items ORDER BY sort_order ASC, id ASC",
-      [req.params.category],
+      "SELECT * FROM menu_items WHERE category=$1 ORDER BY sort_order ASC, id ASC",
+      [category],
     );
+
     res.json(result.rows);
   } catch (err) {
     console.error(err);
