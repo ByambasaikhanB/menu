@@ -1,28 +1,19 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const multer = require("multer");
-const path = require("path");
 const { Pool } = require("pg");
 require("dotenv").config();
 
 const app = express();
 app.use(bodyParser.json());
+app.use(express.static("public"));
 
-// FILE UPLOAD
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "public/uploads"),
-  filename: (req, file, cb) =>
-    cb(null, Date.now() + path.extname(file.originalname)),
-});
-const upload = multer({ storage });
-
-// POSTGRES POOL
+// ================= DATABASE =================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
-// INIT DB
+// Init DB
 async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS menu_items(
@@ -31,7 +22,6 @@ async function initDB() {
       name TEXT,
       ingredients TEXT,
       price INT,
-      kcal TEXT,
       category TEXT
     )
   `);
@@ -49,37 +39,35 @@ async function initDB() {
 }
 initDB();
 
-// ================= API ROUTES =================
-
-// GET menu by category
+// ================= MENU =================
 app.get("/menu/:category", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM menu_items WHERE category=$1 ORDER BY id DESC",
+      "SELECT * FROM menu_items WHERE category=$1",
       [req.params.category],
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).send(err.message);
   }
 });
 
-// POST order
+// ================= ORDERS =================
+// Create order
 app.post("/orders", async (req, res) => {
+  const { table_number, items, total_price } = req.body;
   try {
-    const { table_number, items, total_price } = req.body;
     await pool.query(
-      `INSERT INTO orders(table_number, items, total_price)
-       VALUES($1,$2,$3)`,
-      [table_number, JSON.stringify(items), total_price],
+      `INSERT INTO orders(table_number, items, total_price) VALUES($1,$2,$3)`,
+      [table_number, items, total_price],
     );
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).send(err.message);
   }
 });
 
-// GET orders
+// Get orders (only pending + in progress)
 app.get("/orders", async (req, res) => {
   try {
     const result = await pool.query(
@@ -87,11 +75,11 @@ app.get("/orders", async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).send(err.message);
   }
 });
 
-// PUT order done
+// Mark order done
 app.put("/orders/:id", async (req, res) => {
   try {
     await pool.query("UPDATE orders SET status='done' WHERE id=$1", [
@@ -99,28 +87,9 @@ app.put("/orders/:id", async (req, res) => {
     ]);
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).send(err.message);
   }
 });
-
-// ADD menu (admin)
-app.post("/add-menu", upload.single("image"), async (req, res) => {
-  try {
-    const { name, ingredients, price, kcal, category } = req.body;
-    const image_url = req.file ? "/uploads/" + req.file.filename : null;
-    await pool.query(
-      `INSERT INTO menu_items(name, ingredients, price, kcal, category, image_url)
-       VALUES($1,$2,$3,$4,$5,$6)`,
-      [name, ingredients, price, kcal, category, image_url],
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// STATIC FILES
-app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Server running on port " + PORT));

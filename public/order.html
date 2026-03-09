@@ -60,7 +60,7 @@
           const data = await res.json();
           const div = document.getElementById("orders");
           div.innerHTML = "";
-          // Filter DONE orders
+          // Only show pending orders
           data
             .filter((order) => order.status !== "done")
             .forEach((order) => {
