@@ -1,14 +1,24 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const multer = require("multer");
+const path = require("path");
 const { Pool } = require("pg");
 require("dotenv").config();
 
 const app = express();
-
-// BODY PARSER
 app.use(bodyParser.json());
 
-// --- API ROUTES --- (static files-ээс өмнө байх ёстой)
+// FILE UPLOAD
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "public/uploads"),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + ext);
+  },
+});
+const upload = multer({ storage });
+
+// POSTGRES POOL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
@@ -24,7 +34,10 @@ async function initDB() {
         name TEXT,
         ingredients TEXT,
         price INT,
-        category TEXT
+        kcal TEXT,
+        icons TEXT,
+        category TEXT,
+        sort_order INT
       )
     `);
 
@@ -46,41 +59,127 @@ async function initDB() {
 }
 initDB();
 
-// GET MENU BY CATEGORY
-app.get("/menu/:category", async (req, res) => {
+// ================== MENU API ==================
+
+// GET all menu
+app.get("/menu", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM menu_items WHERE category=$1",
-      [req.params.category],
+      "SELECT * FROM menu_items ORDER BY id DESC",
     );
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to fetch menu" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// CREATE ORDER
-app.post("/orders", async (req, res) => {
+// ADD menu
+app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
-    const { table_number, items, total_price } = req.body;
-
-    // JSONB-д дамжуулахын тулд stringify
-    const itemsJSON = JSON.stringify(items);
+    const { name, ingredients, price, category, kcal, icons, sort_order } =
+      req.body;
+    const image_url = req.file ? "/uploads/" + req.file.filename : null;
 
     await pool.query(
-      `INSERT INTO orders(table_number, items, total_price) VALUES($1,$2,$3)`,
-      [table_number, itemsJSON, total_price],
+      `INSERT INTO menu_items(name, ingredients, price, category, kcal, icons, sort_order, image_url)
+       VALUES($1,$2,$3,$4,$5,$6,$7,$8)`,
+      [
+        name,
+        ingredients,
+        price,
+        category,
+        kcal,
+        icons,
+        sort_order || 0,
+        image_url,
+      ],
     );
 
     res.json({ success: true });
   } catch (err) {
-    console.error("Order insert error:", err);
+    console.error("ADD MENU ERROR:", err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// GET ORDERS
+// UPDATE menu
+app.put("/menu/:id", upload.single("image"), async (req, res) => {
+  try {
+    const { name, ingredients, price, category, kcal, icons, sort_order } =
+      req.body;
+    const image_url = req.file ? "/uploads/" + req.file.filename : null;
+
+    const fields = [];
+    const values = [];
+    let idx = 1;
+
+    if (name) {
+      fields.push(`name=$${idx++}`);
+      values.push(name);
+    }
+    if (ingredients) {
+      fields.push(`ingredients=$${idx++}`);
+      values.push(ingredients);
+    }
+    if (price) {
+      fields.push(`price=$${idx++}`);
+      values.push(price);
+    }
+    if (category) {
+      fields.push(`category=$${idx++}`);
+      values.push(category);
+    }
+    if (kcal) {
+      fields.push(`kcal=$${idx++}`);
+      values.push(kcal);
+    }
+    if (icons) {
+      fields.push(`icons=$${idx++}`);
+      values.push(icons);
+    }
+    if (sort_order) {
+      fields.push(`sort_order=$${idx++}`);
+      values.push(sort_order);
+    }
+    if (image_url) {
+      fields.push(`image_url=$${idx++}`);
+      values.push(image_url);
+    }
+
+    if (fields.length === 0)
+      return res
+        .status(400)
+        .json({ success: false, error: "Nothing to update" });
+
+    values.push(req.params.id);
+
+    await pool.query(
+      `UPDATE menu_items SET ${fields.join(", ")} WHERE id=$${idx}`,
+      values,
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("UPDATE MENU ERROR:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// DELETE menu
+app.delete("/menu/:id", async (req, res) => {
+  try {
+    await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("DELETE MENU ERROR:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ================== ORDERS ==================
+
+// GET orders
 app.get("/orders", async (req, res) => {
   try {
     const result = await pool.query(
@@ -89,11 +188,27 @@ app.get("/orders", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to fetch orders" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// MARK ORDER DONE
+// CREATE order
+app.post("/orders", async (req, res) => {
+  try {
+    const { table_number, items, total_price } = req.body;
+    const itemsJSON = JSON.stringify(items);
+    await pool.query(
+      `INSERT INTO orders(table_number, items, total_price) VALUES($1,$2,$3)`,
+      [table_number, itemsJSON, total_price],
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error("ORDER ERROR:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// MARK DONE
 app.put("/orders/:id", async (req, res) => {
   try {
     await pool.query("UPDATE orders SET status='done' WHERE id=$1", [
@@ -106,9 +221,8 @@ app.put("/orders/:id", async (req, res) => {
   }
 });
 
-// --- STATIC FILES (PUBLIC FOLDER) ---
+// ================== STATIC FILES ==================
 app.use(express.static("public"));
 
-// SERVER
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Server running on port " + PORT));

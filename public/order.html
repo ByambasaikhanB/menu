@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>Orders</title>
@@ -10,18 +10,36 @@
         color: white;
         padding: 20px;
       }
+      h1 {
+        text-align: center;
+      }
       .order {
         background: #222;
         padding: 15px;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         border-radius: 10px;
       }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        border: 1px solid #444;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background: #333;
+      }
       button {
-        padding: 8px 15px;
+        padding: 6px 12px;
         background: green;
         border: none;
         color: white;
         cursor: pointer;
+        border-radius: 5px;
       }
     </style>
   </head>
@@ -31,30 +49,72 @@
 
     <script>
       async function loadOrders() {
-        const res = await fetch("/orders");
-        const data = await res.json();
-        const div = document.getElementById("orders");
-        div.innerHTML = "";
+        try {
+          const res = await fetch("/orders");
+          const data = await res.json();
+          const div = document.getElementById("orders");
+          div.innerHTML = "";
 
-        data.forEach((order) => {
-          div.innerHTML += `
-            <div class="order">
-              <h3>Table: ${order.table_number}</h3>
-              <p>Total: ${order.total_price}₮</p>
-              <p>Status: ${order.status}</p>
-              <button onclick="done(${order.id})">DONE</button>
-            </div>
+          data.forEach((order) => {
+            const orderDiv = document.createElement("div");
+            orderDiv.className = "order";
+
+            let html = `
+            <h3>Table: ${order.table_number}</h3>
+            <p>Status: ${order.status}</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th>Kcal</th>
+                  <th>Icons</th>
+                </tr>
+              </thead>
+              <tbody>
           `;
-        });
+
+            order.items.forEach((item) => {
+              html += `
+              <tr>
+                <td>${item.name}</td>
+                <td>${item.qty || 1}</td>
+                <td>${item.price}₮</td>
+                <td>${item.kcal || "-"}</td>
+                <td>${item.icons || "-"}</td>
+              </tr>
+            `;
+            });
+
+            html += `
+              </tbody>
+            </table>
+            <p><strong>Total: ${order.total_price}₮</strong></p>
+            <button onclick="markDone(${order.id})">DONE</button>
+          `;
+
+            orderDiv.innerHTML = html;
+            div.appendChild(orderDiv);
+          });
+        } catch (err) {
+          console.error("LOAD ORDERS ERROR:", err);
+          alert("Orders load хийхэд алдаа гарлаа");
+        }
       }
 
-      async function done(id) {
-        await fetch("/orders/" + id, { method: "PUT" });
-        loadOrders();
+      async function markDone(id) {
+        try {
+          await fetch("/orders/" + id, { method: "PUT" });
+          loadOrders();
+        } catch (err) {
+          console.error(err);
+          alert("Status update хийхэд алдаа гарлаа");
+        }
       }
 
       loadOrders();
-      setInterval(loadOrders, 3000);
+      setInterval(loadOrders, 3000); // 3 секунд тутамд шинэчлэх
     </script>
   </body>
 </html>
