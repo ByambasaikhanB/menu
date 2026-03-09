@@ -10,10 +10,6 @@
         color: white;
         padding: 20px;
       }
-      h1 {
-        text-align: center;
-        margin-bottom: 30px;
-      }
       .order {
         background: #222;
         padding: 15px;
@@ -58,7 +54,6 @@
   <body>
     <h1>Orders</h1>
     <div id="orders"></div>
-
     <script>
       async function loadOrders() {
         try {
@@ -66,80 +61,55 @@
           const data = await res.json();
           const div = document.getElementById("orders");
           div.innerHTML = "";
-
           data.forEach((order) => {
             const orderDiv = document.createElement("div");
             orderDiv.className = "order";
-
             let html = `
-            <h3>Table: ${order.table_number}</h3>
-            <p>Status: ${order.status}</p>
-            <p>Ordered at: ${new Date(order.created_at).toLocaleString()}</p>
-            <p class="timer" id="timer-${order.id}">Elapsed: 0s</p>
-            <table>
-              <thead>
-                <tr>
-                  <th>Image</th>
-                  <th>Name</th>
-                  <th>Qty</th>
-                  <th>Price</th>
-                  <th>Kcal</th>
-                </tr>
-              </thead>
-              <tbody>
-          `;
-
+        <h3>Table: ${order.table_number}</h3>
+        <p>Status: ${order.status}</p>
+        <p>Ordered at: ${new Date(order.created_at).toLocaleString()}</p>
+        <p class="timer" id="timer-${order.id}">Elapsed: 0s</p>
+        <table>
+        <thead><tr>
+          <th>Image</th><th>Name</th><th>Qty</th><th>Price</th><th>Kcal</th>
+        </tr></thead><tbody>`;
             order.items.forEach((item) => {
               html += `
-              <tr>
-                <td>${item.image_url ? `<img src="${item.image_url}" />` : "-"}</td>
-                <td>${item.name}</td>
-                <td>${item.qty || 1}</td>
-                <td>${item.price}₮</td>
-                <td>${item.kcal ? `<img src="/images/kcal_icon.png" title="${item.kcal}" />` : "-"}</td>
-              </tr>
-            `;
+          <tr>
+            <td>${item.image_url ? `<img src="${item.image_url}">` : "-"}</td>
+            <td>${item.name}</td>
+            <td>${item.qty || 1}</td>
+            <td>${item.price}₮</td>
+            <td>${item.kcal ? `<img src="/images/kcal_icon.png" title="${item.kcal}">` : "-"}</td>
+          </tr>`;
             });
-
-            html += `
-              </tbody>
-            </table>
-            <p><strong>Total: ${order.total_price}₮</strong></p>
-            <button onclick="markDone(${order.id})">DONE</button>
-          `;
-
+            html += `</tbody></table>
+        <p><strong>Total: ${order.total_price}₮</strong></p>
+        <button onclick="markDone(${order.id})">DONE</button>`;
             orderDiv.innerHTML = html;
             div.appendChild(orderDiv);
 
-            // ================= Timer =================
+            // TIMER
             const startTime = new Date(order.created_at).getTime();
             const timerEl = document.getElementById(`timer-${order.id}`);
             setInterval(() => {
               const now = Date.now();
               const elapsed = Math.floor((now - startTime) / 1000);
-              const minutes = Math.floor(elapsed / 60);
-              const seconds = elapsed % 60;
-              timerEl.innerText = `Elapsed: ${minutes}m ${seconds}s`;
+              const min = Math.floor(elapsed / 60);
+              const sec = elapsed % 60;
+              timerEl.innerText = `Elapsed: ${min}m ${sec}s`;
             }, 1000);
           });
         } catch (err) {
-          console.error("LOAD ORDERS ERROR:", err);
-          alert("Orders load хийхэд алдаа гарлаа");
-        }
-      }
-
-      async function markDone(id) {
-        try {
-          await fetch("/orders/" + id, { method: "PUT" });
-          loadOrders();
-        } catch (err) {
           console.error(err);
-          alert("Status update хийхэд алдаа гарлаа");
         }
       }
-
+      async function markDone(id) {
+        await fetch("/orders/" + id, { method: "PUT" });
+        loadOrders();
+      }
       loadOrders();
-      setInterval(loadOrders, 5000); // 5 секунд тутамд шинэчлэх
+      setInterval(loadOrders, 5000);
     </script>
   </body>
 </html>
