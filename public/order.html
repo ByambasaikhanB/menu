@@ -12,6 +12,7 @@
       }
       h1 {
         text-align: center;
+        margin-bottom: 30px;
       }
       .order {
         background: #222;
@@ -29,9 +30,16 @@
         border: 1px solid #444;
         padding: 8px;
         text-align: left;
+        vertical-align: middle;
       }
       th {
         background: #333;
+      }
+      img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 5px;
       }
       button {
         padding: 6px 12px;
@@ -40,6 +48,10 @@
         color: white;
         cursor: pointer;
         border-radius: 5px;
+      }
+      .timer {
+        font-style: italic;
+        color: #0f0;
       }
     </style>
   </head>
@@ -62,14 +74,16 @@
             let html = `
             <h3>Table: ${order.table_number}</h3>
             <p>Status: ${order.status}</p>
+            <p>Ordered at: ${new Date(order.created_at).toLocaleString()}</p>
+            <p class="timer" id="timer-${order.id}">Elapsed: 0s</p>
             <table>
               <thead>
                 <tr>
+                  <th>Image</th>
                   <th>Name</th>
                   <th>Qty</th>
                   <th>Price</th>
                   <th>Kcal</th>
-                  <th>Icons</th>
                 </tr>
               </thead>
               <tbody>
@@ -78,11 +92,11 @@
             order.items.forEach((item) => {
               html += `
               <tr>
+                <td>${item.image_url ? `<img src="${item.image_url}" />` : "-"}</td>
                 <td>${item.name}</td>
                 <td>${item.qty || 1}</td>
                 <td>${item.price}₮</td>
-                <td>${item.kcal || "-"}</td>
-                <td>${item.icons || "-"}</td>
+                <td>${item.kcal ? `<img src="/images/kcal_icon.png" title="${item.kcal}" />` : "-"}</td>
               </tr>
             `;
             });
@@ -96,6 +110,17 @@
 
             orderDiv.innerHTML = html;
             div.appendChild(orderDiv);
+
+            // ================= Timer =================
+            const startTime = new Date(order.created_at).getTime();
+            const timerEl = document.getElementById(`timer-${order.id}`);
+            setInterval(() => {
+              const now = Date.now();
+              const elapsed = Math.floor((now - startTime) / 1000);
+              const minutes = Math.floor(elapsed / 60);
+              const seconds = elapsed % 60;
+              timerEl.innerText = `Elapsed: ${minutes}m ${seconds}s`;
+            }, 1000);
           });
         } catch (err) {
           console.error("LOAD ORDERS ERROR:", err);
@@ -114,7 +139,7 @@
       }
 
       loadOrders();
-      setInterval(loadOrders, 3000); // 3 секунд тутамд шинэчлэх
+      setInterval(loadOrders, 5000); // 5 секунд тутамд шинэчлэх
     </script>
   </body>
 </html>
