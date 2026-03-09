@@ -1,11 +1,20 @@
 const wrapper = document.getElementById("menu-wrapper");
 
-const swiper = new Swiper(".testimonial__swiper", {
-  slidesPerView: "auto",
-  spaceBetween: 20,
-});
-
+let swiper;
 let cart = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  swiper = new Swiper(".swiper", {
+    slidesPerView: 1,
+
+    spaceBetween: 20,
+
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+    },
+  });
+});
 
 async function loadMenu(category) {
   const res = await fetch("/menu/" + category);
@@ -38,7 +47,7 @@ Order
 `;
   });
 
-  swiper.update();
+  if (swiper) swiper.update();
 }
 
 function addToCart(item) {

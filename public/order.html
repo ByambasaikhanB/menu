@@ -1,14 +1,15 @@
 <!doctype html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8" />
-    <title>Orders Monitor</title>
+
+    <title>Barmen Orders</title>
 
     <style>
       body {
-        font-family: Arial;
         background: #111;
         color: white;
+        font-family: Arial;
         padding: 40px;
       }
 
@@ -24,23 +25,14 @@
         text-align: center;
       }
 
-      .pending {
-        color: orange;
-      }
-
-      .done {
-        color: lime;
-      }
-
       button {
         padding: 6px 12px;
-        cursor: pointer;
       }
     </style>
   </head>
 
   <body>
-    <h1>Kitchen / Barmen Orders</h1>
+    <h1>Barmen Orders</h1>
 
     <table>
       <thead>
@@ -50,7 +42,7 @@
           <th>Items</th>
           <th>Total</th>
           <th>Status</th>
-          <th>Action</th>
+          <th>Done</th>
         </tr>
       </thead>
 
@@ -67,32 +59,24 @@
 
         table.innerHTML = "";
 
-        data.forEach((order) => {
+        data.forEach((o) => {
           const row = document.createElement("tr");
 
           row.innerHTML = `
 
-<td>${order.id}</td>
+<td>${o.id}</td>
 
-<td>Table ${order.table_number}</td>
+<td>${o.table_number}</td>
 
-<td>
+<td>${o.items.map((i) => i.name).join(", ")}</td>
 
-${order.items.map((i) => i.name).join(", ")}
+<td>${o.total_price}₮</td>
 
-</td>
-
-<td>${order.total_price}₮</td>
-
-<td class="${order.status}">
-
-${order.status}
-
-</td>
+<td>${o.status}</td>
 
 <td>
 
-<button onclick="done(${order.id})">
+<button onclick="done(${o.id})">
 
 Done
 
@@ -107,9 +91,7 @@ Done
       }
 
       async function done(id) {
-        await fetch("/orders/" + id, {
-          method: "PUT",
-        });
+        await fetch("/orders/" + id, { method: "PUT" });
 
         loadOrders();
       }
