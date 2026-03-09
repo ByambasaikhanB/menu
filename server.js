@@ -8,26 +8,26 @@ require("dotenv").config();
 
 const app = express();
 
-// ================= CLOUDINARY =================
+// ===== CLOUDINARY =====
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-// ================= DATABASE =================
+// ===== DATABASE =====
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
-// ================= MIDDLEWARE =================
+// ===== MIDDLEWARE =====
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
 const upload = multer({ dest: "tmp/" });
 
-// ================= SAFE DB INIT =================
+// ===== DB INIT =====
 async function initDB() {
   try {
     await pool.query(`
@@ -39,71 +39,53 @@ async function initDB() {
         price TEXT NOT NULL,
         kcal TEXT,
         icons TEXT,
-        category TEXT
+        category TEXT,
+        sort_order INT DEFAULT 0
       );
     `);
 
-    // sort_order column байхгүй бол нэмнэ
     await pool.query(`
-      ALTER TABLE menu_items
-      ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 0;
+      CREATE TABLE IF NOT EXISTS orders (
+        id SERIAL PRIMARY KEY,
+        table_number TEXT NOT NULL,
+        items JSONB NOT NULL,
+        total_price INT,
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     console.log("Database ready");
   } catch (err) {
-    console.error("DB INIT ERROR:", err);
+    console.error(err);
   }
 }
 initDB();
 
-// =================================================
-// ================= API ROUTES ====================
-// =================================================
+// ===== MENU API =====
 
-// GET ALL
+// бүх menu
 app.get("/menu", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM menu_items ORDER BY sort_order ASC, id DESC",
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
+  const result = await pool.query(
+    "SELECT * FROM menu_items ORDER BY sort_order ASC, id DESC",
+  );
+  res.json(result.rows);
 });
 
-// GET BY CATEGORY
-// GET BY CATEGORY
+// category menu
 app.get("/menu/:category", async (req, res) => {
-  try {
-    const { category } = req.params;
-
-    const result = await pool.query(
-      "SELECT * FROM menu_items WHERE category=$1 ORDER BY sort_order ASC, id ASC",
-      [category],
-    );
-
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
+  const result = await pool.query(
+    "SELECT * FROM menu_items WHERE category=$1 ORDER BY sort_order ASC,id ASC",
+    [req.params.category],
+  );
+  res.json(result.rows);
 });
 
-// ADD MENU
+// add menu
 app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
     let { name, ingredients, price, kcal, icons, category, sort_order } =
       req.body;
-
-    if (!name || !price || !category) {
-      return res.status(400).json({ success: false, error: "Missing fields" });
-    }
-
-    name = name.toUpperCase();
-    ingredients = ingredients ? ingredients.toUpperCase() : null;
-    category = category.toLowerCase();
 
     let image_url = null;
 
@@ -111,19 +93,20 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "menu_items",
       });
+
       image_url = result.secure_url;
       fs.unlinkSync(req.file.path);
     }
 
     const result = await pool.query(
       `INSERT INTO menu_items
-       (image_url,name,ingredients,price,kcal,icons,category,sort_order)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-       RETURNING *`,
+      (image_url,name,ingredients,price,kcal,icons,category,sort_order)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING *`,
       [
         image_url,
-        name,
-        ingredients,
+        name.toUpperCase(),
+        ingredients ? ingredients.toUpperCase() : null,
         price,
         kcal || null,
         icons || null,
@@ -135,20 +118,16 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
     res.json({ success: true, item: result.rows[0] });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false });
   }
 });
 
-// UPDATE
+// update
 app.put("/menu/:id", upload.single("image"), async (req, res) => {
   try {
     const { id } = req.params;
     let { name, ingredients, price, kcal, icons, category, sort_order } =
       req.body;
-
-    name = name.toUpperCase();
-    ingredients = ingredients ? ingredients.toUpperCase() : null;
-    category = category.toLowerCase();
 
     let image_url = null;
 
@@ -156,6 +135,7 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "menu_items",
       });
+
       image_url = result.secure_url;
       fs.unlinkSync(req.file.path);
     }
@@ -163,18 +143,12 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
     if (image_url) {
       await pool.query(
         `UPDATE menu_items
-         SET name=$1,
-             ingredients=$2,
-             price=$3,
-             kcal=$4,
-             icons=$5,
-             category=$6,
-             sort_order=$7,
-             image_url=$8
+         SET name=$1,ingredients=$2,price=$3,kcal=$4,icons=$5,
+         category=$6,sort_order=$7,image_url=$8
          WHERE id=$9`,
         [
-          name,
-          ingredients,
+          name.toUpperCase(),
+          ingredients ? ingredients.toUpperCase() : null,
           price,
           kcal || null,
           icons || null,
@@ -187,17 +161,12 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
     } else {
       await pool.query(
         `UPDATE menu_items
-         SET name=$1,
-             ingredients=$2,
-             price=$3,
-             kcal=$4,
-             icons=$5,
-             category=$6,
-             sort_order=$7
+         SET name=$1,ingredients=$2,price=$3,kcal=$4,icons=$5,
+         category=$6,sort_order=$7
          WHERE id=$8`,
         [
-          name,
-          ingredients,
+          name.toUpperCase(),
+          ingredients ? ingredients.toUpperCase() : null,
           price,
           kcal || null,
           icons || null,
@@ -211,29 +180,53 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// DELETE
+// delete
 app.delete("/menu/:id", async (req, res) => {
+  await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
+  res.json({ success: true });
+});
+
+// ===== ORDER API =====
+
+// create order
+app.post("/orders", async (req, res) => {
   try {
-    await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
+    const { table_number, items, total_price } = req.body;
+
+    await pool.query(
+      `INSERT INTO orders (table_number,items,total_price)
+       VALUES ($1,$2,$3)`,
+      [table_number, items, total_price],
+    );
+
     res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
   }
 });
 
-// ================= STATIC =================
-app.use(express.static("public"));
-
-// ================= GLOBAL ERROR HANDLER =================
-app.use((err, req, res, next) => {
-  console.error("GLOBAL ERROR:", err);
-  res.status(500).json({ error: err.message });
+// orders list
+app.get("/orders", async (req, res) => {
+  const result = await pool.query(
+    "SELECT * FROM orders ORDER BY created_at DESC",
+  );
+  res.json(result.rows);
 });
 
+// done
+app.put("/orders/:id", async (req, res) => {
+  await pool.query("UPDATE orders SET status='done' WHERE id=$1", [
+    req.params.id,
+  ]);
+
+  res.json({ success: true });
+});
+
+// ===== STATIC =====
+app.use(express.static("public"));
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Server running on port " + PORT));
+app.listen(PORT, () => console.log("Server running " + PORT));

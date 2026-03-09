@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Orders Monitor</title>
+
+    <style>
+      body {
+        font-family: Arial;
+        background: #111;
+        color: white;
+        padding: 40px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        border: 1px solid #444;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .pending {
+        color: orange;
+      }
+
+      .done {
+        color: lime;
+      }
+
+      button {
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Kitchen / Barmen Orders</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Table</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody id="ordersTable"></tbody>
+    </table>
+
+    <script>
+      async function loadOrders() {
+        const res = await fetch("/orders");
+
+        const data = await res.json();
+
+        const table = document.getElementById("ordersTable");
+
+        table.innerHTML = "";
+
+        data.forEach((order) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+
+<td>${order.id}</td>
+
+<td>Table ${order.table_number}</td>
+
+<td>
+
+${order.items.map((i) => i.name).join(", ")}
+
+</td>
+
+<td>${order.total_price}₮</td>
+
+<td class="${order.status}">
+
+${order.status}
+
+</td>
+
+<td>
+
+<button onclick="done(${order.id})">
+
+Done
+
+</button>
+
+</td>
+
+`;
+
+          table.appendChild(row);
+        });
+      }
+
+      async function done(id) {
+        await fetch("/orders/" + id, {
+          method: "PUT",
+        });
+
+        loadOrders();
+      }
+
+      loadOrders();
+
+      setInterval(loadOrders, 3000);
+    </script>
+  </body>
+</html>
