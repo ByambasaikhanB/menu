@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <title>Orders</title>
-
     <style>
       body {
         font-family: Arial;
@@ -11,14 +10,12 @@
         color: white;
         padding: 20px;
       }
-
       .order {
         background: #222;
         padding: 15px;
         margin-bottom: 10px;
         border-radius: 10px;
       }
-
       button {
         padding: 8px 15px;
         background: green;
@@ -28,51 +25,35 @@
       }
     </style>
   </head>
-
   <body>
     <h1>Orders</h1>
-
     <div id="orders"></div>
 
     <script>
       async function loadOrders() {
         const res = await fetch("/orders");
-
         const data = await res.json();
-
         const div = document.getElementById("orders");
-
         div.innerHTML = "";
 
         data.forEach((order) => {
           div.innerHTML += `
-
-<div class="order">
-
-<h3>Table: ${order.table_number}</h3>
-
-<p>Total: ${order.total_price}₮</p>
-
-<p>Status: ${order.status}</p>
-
-<button onclick="done(${order.id})">DONE</button>
-
-</div>
-
-`;
+            <div class="order">
+              <h3>Table: ${order.table_number}</h3>
+              <p>Total: ${order.total_price}₮</p>
+              <p>Status: ${order.status}</p>
+              <button onclick="done(${order.id})">DONE</button>
+            </div>
+          `;
         });
       }
 
       async function done(id) {
-        await fetch("/orders/" + id, {
-          method: "PUT",
-        });
-
+        await fetch("/orders/" + id, { method: "PUT" });
         loadOrders();
       }
 
       loadOrders();
-
       setInterval(loadOrders, 3000);
     </script>
   </body>

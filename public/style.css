@@ -168,3 +168,58 @@ body::before {
     width: auto;
   }
 }
+/* CART */
+
+.cart {
+  position: fixed;
+  right: 20px;
+  top: 120px;
+  width: 260px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  font-family: var(--body-font);
+  z-index: 999;
+}
+
+.cart h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.cart-remove {
+  color: red;
+  cursor: pointer;
+}
+
+.cart-total {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.cart input {
+  width: 100%;
+  padding: 6px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+.cart button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  border: none;
+  background: var(--second-color);
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
