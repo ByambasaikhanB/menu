@@ -55,48 +55,45 @@
     <div id="orders"></div>
     <script>
       async function loadOrders() {
+        const div = document.getElementById("orders");
+        div.innerHTML = "";
         try {
           const res = await fetch("/orders");
           const data = await res.json();
-          const div = document.getElementById("orders");
-          div.innerHTML = "";
-          // Only show pending orders
-          data
-            .filter((order) => order.status !== "done")
-            .forEach((order) => {
-              const orderDiv = document.createElement("div");
-              orderDiv.className = "order";
-              let html = `
-              <h3>Table: ${order.table_number}</h3>
-              <p>Status: ${order.status}</p>
-              <p>Ordered at: ${new Date(order.created_at).toLocaleString()}</p>
-              <p class="timer" id="timer-${order.id}">Elapsed: 0s</p>
-              <table>
-                <thead><tr><th>Image</th><th>Name</th><th>Price</th></tr></thead>
-                <tbody>`;
-              order.items.forEach((item) => {
-                html += `<tr>
-                <td>${item.image_url ? `<img src="${item.image_url}">` : "-"}</td>
-                <td>${item.name}</td>
-                <td>${item.price}₮</td>
-              </tr>`;
-              });
-              html += `</tbody></table>
-              <p><strong>Total: ${order.total_price}₮</strong></p>
-              <button onclick="markDone(${order.id})">DONE</button>`;
-              orderDiv.innerHTML = html;
-              div.appendChild(orderDiv);
-
-              // TIMER
-              const startTime = new Date(order.created_at).getTime();
-              const timerEl = document.getElementById(`timer-${order.id}`);
-              setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const min = Math.floor(elapsed / 60);
-                const sec = elapsed % 60;
-                timerEl.innerText = `Elapsed: ${min}m ${sec}s`;
-              }, 1000);
+          data.forEach((order) => {
+            if (order.status === "done") return; // done бол үзүүлэхгүй
+            const orderDiv = document.createElement("div");
+            orderDiv.className = "order";
+            let html = `
+        <h3>Table: ${order.table_number}</h3>
+        <p>Status: ${order.status}</p>
+        <p>Ordered at: ${new Date(order.created_at).toLocaleString()}</p>
+        <p class="timer" id="timer-${order.id}">Elapsed: 0s</p>
+        <table>
+          <thead><tr><th>Image</th><th>Name</th><th>Price</th></tr></thead><tbody>`;
+            order.items.forEach((item) => {
+              html += `<tr>
+          <td>${item.image_url ? `<img src="${item.image_url}">` : "-"}</td>
+          <td>${item.name}</td>
+          <td>${item.price}₮</td>
+        </tr>`;
             });
+            html += `</tbody></table>
+        <p><strong>Total: ${order.total_price}₮</strong></p>
+        <button onclick="markDone(${order.id})">DONE</button>`;
+            orderDiv.innerHTML = html;
+            div.appendChild(orderDiv);
+
+            // Timer
+            const startTime = new Date(order.created_at).getTime();
+            const timerEl = document.getElementById(`timer-${order.id}`);
+            setInterval(() => {
+              const elapsed = Math.floor((Date.now() - startTime) / 1000);
+              const min = Math.floor(elapsed / 60);
+              const sec = elapsed % 60;
+              timerEl.innerText = `Elapsed: ${min}m ${sec}s`;
+            }, 1000);
+          });
         } catch (err) {
           console.error(err);
         }
@@ -104,7 +101,7 @@
 
       async function markDone(id) {
         await fetch("/orders/" + id, { method: "PUT" });
-        loadOrders(); // DONE болгоход remove
+        loadOrders();
       }
 
       loadOrders();

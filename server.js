@@ -1,3 +1,4 @@
+// server.js
 const express = require("express");
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
@@ -7,7 +8,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static("public"));
 
-// ================= DATABASE =================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
@@ -48,26 +48,12 @@ app.get("/menu/:category", async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).send(err.message);
+    console.error(err);
+    res.status(500).json({ success: false, error: "Server error" });
   }
 });
 
 // ================= ORDERS =================
-// Create order
-app.post("/orders", async (req, res) => {
-  const { table_number, items, total_price } = req.body;
-  try {
-    await pool.query(
-      `INSERT INTO orders(table_number, items, total_price) VALUES($1,$2,$3)`,
-      [table_number, items, total_price],
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
-
-// Get orders (only pending + in progress)
 app.get("/orders", async (req, res) => {
   try {
     const result = await pool.query(
@@ -75,11 +61,28 @@ app.get("/orders", async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).send(err.message);
+    console.error(err);
+    res.status(500).json({ success: false, error: "Server error" });
   }
 });
 
-// Mark order done
+app.post("/orders", async (req, res) => {
+  try {
+    const { table_number, items, total_price } = req.body;
+    if (!table_number || !items || !total_price)
+      return res.status(400).json({ success: false, error: "Missing fields" });
+
+    await pool.query(
+      "INSERT INTO orders(table_number, items, total_price) VALUES($1, $2, $3)",
+      [table_number, JSON.stringify(items), total_price],
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error("POST /orders ERROR:", err);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
 app.put("/orders/:id", async (req, res) => {
   try {
     await pool.query("UPDATE orders SET status='done' WHERE id=$1", [
@@ -87,7 +90,8 @@ app.put("/orders/:id", async (req, res) => {
     ]);
     res.json({ success: true });
   } catch (err) {
-    res.status(500).send(err.message);
+    console.error(err);
+    res.status(500).json({ success: false, error: "Server error" });
   }
 });
 

@@ -18,23 +18,19 @@
       </div>
     </section>
 
-    <!-- CART -->
     <div class="cart" id="cart">
       <h2>Cart</h2>
       <div id="cart-items"></div>
-      <p class="cart-total" id="cart-total">Total: 0₮</p>
+      <p class="cart-total">Total: 0₮</p>
       <input id="tableNumber" placeholder="Table number" />
       <button onclick="submitOrder()">Send Order</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="/App.js"></script>
     <script>
-      const wrapper = document.getElementById("menu-wrapper");
-      let swiper,
-        cart = [];
-
       document.addEventListener("DOMContentLoaded", () => {
-        swiper = new Swiper(".testimonial__swiper", {
+        const swiper = new Swiper(".testimonial__swiper", {
           loop: false,
           slidesPerView: "auto",
           centeredSlides: true,
@@ -42,93 +38,8 @@
           grabCursor: true,
           pagination: { el: ".swiper-pagination", clickable: true },
         });
-        loadMenu("food");
-        renderCart();
+        loadMenu("food", "menu-wrapper");
       });
-
-      async function loadMenu(category) {
-        try {
-          const res = await fetch("/menu/" + category);
-          if (!res.ok) throw new Error("Load menu error");
-          const data = await res.json();
-          wrapper.innerHTML = "";
-          data.forEach((item) => {
-            wrapper.innerHTML += `
-              <div class="swiper-slide testimonial__card">
-                <img src="${item.image_url}" class="testimonial__img"/>
-                <div class="testimonial__overlay">
-                  <h3>${item.name}</h3>
-                  <p>${item.ingredients || ""}</p>
-                  <span>${item.price}₮</span>
-                  <button onclick='addToCart(${JSON.stringify(item)})'>Order</button>
-                </div>
-              </div>`;
-          });
-          if (swiper) swiper.update();
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
-      function addToCart(item) {
-        cart.push(item);
-        alert(item.name + " added");
-        renderCart();
-      }
-
-      function renderCart() {
-        const cartDiv = document.getElementById("cart-items");
-        cartDiv.innerHTML = "";
-        let total = 0;
-        cart.forEach((item, idx) => {
-          total += Number(item.price);
-          const div = document.createElement("div");
-          div.className = "cart-item";
-          div.innerHTML = `
-            ${item.name} - ${item.price}₮
-            <span class="cart-remove" onclick="removeFromCart(${idx})">x</span>`;
-          cartDiv.appendChild(div);
-        });
-        document.getElementById("cart-total").innerText = `Total: ${total}₮`;
-      }
-
-      function removeFromCart(idx) {
-        cart.splice(idx, 1);
-        renderCart();
-      }
-
-      async function submitOrder() {
-        if (cart.length === 0) {
-          alert("Cart empty");
-          return;
-        }
-        const table = document.getElementById("tableNumber").value;
-        if (!table) {
-          alert("Enter table number");
-          return;
-        }
-        const total = cart.reduce((sum, i) => sum + Number(i.price), 0);
-        try {
-          const res = await fetch("/orders", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              table_number: table,
-              items: cart,
-              total_price: total,
-            }),
-          });
-          const result = await res.json();
-          if (result.success) {
-            alert("Order sent");
-            cart = [];
-            renderCart();
-          }
-        } catch (err) {
-          console.error(err);
-          alert("Error sending order");
-        }
-      }
     </script>
   </body>
 </html>
