@@ -2,52 +2,37 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-
-    <title>Barmen Orders</title>
+    <title>Orders</title>
 
     <style>
       body {
+        font-family: Arial;
         background: #111;
         color: white;
-        font-family: Arial;
-        padding: 40px;
+        padding: 20px;
       }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th,
-      td {
-        border: 1px solid #444;
-        padding: 10px;
-        text-align: center;
+      .order {
+        background: #222;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 10px;
       }
 
       button {
-        padding: 6px 12px;
+        padding: 8px 15px;
+        background: green;
+        border: none;
+        color: white;
+        cursor: pointer;
       }
     </style>
   </head>
 
   <body>
-    <h1>Barmen Orders</h1>
+    <h1>Orders</h1>
 
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Table</th>
-          <th>Items</th>
-          <th>Total</th>
-          <th>Status</th>
-          <th>Done</th>
-        </tr>
-      </thead>
-
-      <tbody id="ordersTable"></tbody>
-    </table>
+    <div id="orders"></div>
 
     <script>
       async function loadOrders() {
@@ -55,43 +40,33 @@
 
         const data = await res.json();
 
-        const table = document.getElementById("ordersTable");
+        const div = document.getElementById("orders");
 
-        table.innerHTML = "";
+        div.innerHTML = "";
 
-        data.forEach((o) => {
-          const row = document.createElement("tr");
+        data.forEach((order) => {
+          div.innerHTML += `
 
-          row.innerHTML = `
+<div class="order">
 
-<td>${o.id}</td>
+<h3>Table: ${order.table_number}</h3>
 
-<td>${o.table_number}</td>
+<p>Total: ${order.total_price}₮</p>
 
-<td>${o.items.map((i) => i.name).join(", ")}</td>
+<p>Status: ${order.status}</p>
 
-<td>${o.total_price}₮</td>
+<button onclick="done(${order.id})">DONE</button>
 
-<td>${o.status}</td>
-
-<td>
-
-<button onclick="done(${o.id})">
-
-Done
-
-</button>
-
-</td>
+</div>
 
 `;
-
-          table.appendChild(row);
         });
       }
 
       async function done(id) {
-        await fetch("/orders/" + id, { method: "PUT" });
+        await fetch("/orders/" + id, {
+          method: "PUT",
+        });
 
         loadOrders();
       }

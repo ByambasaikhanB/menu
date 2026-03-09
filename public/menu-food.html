@@ -1,7 +1,8 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Food Menu</title>
 
@@ -14,15 +15,17 @@
   </head>
 
   <body>
-    <h1>Food Menu</h1>
+    <section class="testimonial container">
+      <h2 class="testimonial__title">Food Menu</h2>
 
-    <div class="swiper">
-      <div class="swiper-wrapper" id="menu-wrapper"></div>
+      <div class="testimonial__swiper swiper">
+        <div class="swiper-wrapper" id="menu-wrapper"></div>
 
-      <div class="swiper-pagination"></div>
-    </div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </section>
 
-    <div class="order-box">
+    <div class="checkout">
       <input id="tableNumber" placeholder="Table number" />
 
       <button onclick="submitOrder()">Send Order</button>

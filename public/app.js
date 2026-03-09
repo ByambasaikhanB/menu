@@ -4,10 +4,16 @@ let swiper;
 let cart = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-  swiper = new Swiper(".swiper", {
-    slidesPerView: 1,
+  swiper = new Swiper(".testimonial__swiper", {
+    loop: false,
 
-    spaceBetween: 20,
+    slidesPerView: "auto",
+
+    centeredSlides: true,
+
+    spaceBetween: 24,
+
+    grabCursor: true,
 
     pagination: {
       el: ".swiper-pagination",
@@ -26,21 +32,25 @@ async function loadMenu(category) {
   data.forEach((item) => {
     wrapper.innerHTML += `
 
-<div class="swiper-slide">
+<div class="swiper-slide testimonial__card">
 
-<img src="${item.image_url}" width="200">
+<img src="${item.image_url}" class="testimonial__img"/>
+
+<div class="testimonial__overlay">
 
 <h3>${item.name}</h3>
 
 <p>${item.ingredients || ""}</p>
 
-<p>${item.price}₮</p>
+<span>${item.price}₮</span>
 
 <button onclick='addToCart(${JSON.stringify(item)})'>
 
 Order
 
 </button>
+
+</div>
 
 </div>
 
@@ -64,6 +74,12 @@ async function submitOrder() {
   }
 
   const table = document.getElementById("tableNumber").value;
+
+  if (!table) {
+    alert("Table number");
+
+    return;
+  }
 
   const total = cart.reduce((sum, i) => sum + Number(i.price), 0);
 
