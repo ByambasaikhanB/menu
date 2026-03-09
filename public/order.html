@@ -26,7 +26,6 @@
         border: 1px solid #444;
         padding: 8px;
         text-align: left;
-        vertical-align: middle;
       }
       th {
         background: #333;
@@ -70,17 +69,15 @@
         <p>Ordered at: ${new Date(order.created_at).toLocaleString()}</p>
         <p class="timer" id="timer-${order.id}">Elapsed: 0s</p>
         <table>
-        <thead><tr>
-          <th>Image</th><th>Name</th><th>Qty</th><th>Price</th><th>Kcal</th>
-        </tr></thead><tbody>`;
+          <thead><tr>
+            <th>Image</th><th>Name</th><th>Price</th>
+          </tr></thead><tbody>`;
             order.items.forEach((item) => {
               html += `
           <tr>
             <td>${item.image_url ? `<img src="${item.image_url}">` : "-"}</td>
             <td>${item.name}</td>
-            <td>${item.qty || 1}</td>
             <td>${item.price}₮</td>
-            <td>${item.kcal ? `<img src="/images/kcal_icon.png" title="${item.kcal}">` : "-"}</td>
           </tr>`;
             });
             html += `</tbody></table>
@@ -93,8 +90,7 @@
             const startTime = new Date(order.created_at).getTime();
             const timerEl = document.getElementById(`timer-${order.id}`);
             setInterval(() => {
-              const now = Date.now();
-              const elapsed = Math.floor((now - startTime) / 1000);
+              const elapsed = Math.floor((Date.now() - startTime) / 1000);
               const min = Math.floor(elapsed / 60);
               const sec = elapsed % 60;
               timerEl.innerText = `Elapsed: ${min}m ${sec}s`;
@@ -104,10 +100,12 @@
           console.error(err);
         }
       }
+
       async function markDone(id) {
         await fetch("/orders/" + id, { method: "PUT" });
         loadOrders();
       }
+
       loadOrders();
       setInterval(loadOrders, 5000);
     </script>

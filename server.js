@@ -46,24 +46,10 @@ async function initDB() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
-
-  console.log("DB ready");
 }
 initDB();
 
 // ================= API ROUTES =================
-
-// GET all menu
-app.get("/menu", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM menu_items ORDER BY id DESC",
-    );
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 // GET menu by category
 app.get("/menu/:category", async (req, res) => {
@@ -78,40 +64,59 @@ app.get("/menu/:category", async (req, res) => {
   }
 });
 
+// POST order
+app.post("/orders", async (req, res) => {
+  try {
+    const { table_number, items, total_price } = req.body;
+    await pool.query(
+      `INSERT INTO orders(table_number, items, total_price)
+       VALUES($1,$2,$3)`,
+      [table_number, JSON.stringify(items), total_price],
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET orders
+app.get("/orders", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM orders ORDER BY created_at DESC",
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT order done
+app.put("/orders/:id", async (req, res) => {
+  try {
+    await pool.query("UPDATE orders SET status='done' WHERE id=$1", [
+      req.params.id,
+    ]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ADD menu (admin)
 app.post("/add-menu", upload.single("image"), async (req, res) => {
-  const { name, ingredients, price, kcal, category } = req.body;
-  const image_url = req.file ? "/uploads/" + req.file.filename : null;
-  await pool.query(
-    `INSERT INTO menu_items(name, ingredients, price, kcal, category, image_url)
-    VALUES($1,$2,$3,$4,$5,$6)`,
-    [name, ingredients, price, kcal, category, image_url],
-  );
-  res.json({ success: true });
-});
-
-// ORDERS
-app.get("/orders", async (req, res) => {
-  const result = await pool.query(
-    "SELECT * FROM orders ORDER BY created_at DESC",
-  );
-  res.json(result.rows);
-});
-
-app.post("/orders", async (req, res) => {
-  const { table_number, items, total_price } = req.body;
-  await pool.query(
-    `INSERT INTO orders(table_number, items, total_price) VALUES($1,$2,$3)`,
-    [table_number, JSON.stringify(items), total_price],
-  );
-  res.json({ success: true });
-});
-
-app.put("/orders/:id", async (req, res) => {
-  await pool.query("UPDATE orders SET status='done' WHERE id=$1", [
-    req.params.id,
-  ]);
-  res.json({ success: true });
+  try {
+    const { name, ingredients, price, kcal, category } = req.body;
+    const image_url = req.file ? "/uploads/" + req.file.filename : null;
+    await pool.query(
+      `INSERT INTO menu_items(name, ingredients, price, kcal, category, image_url)
+       VALUES($1,$2,$3,$4,$5,$6)`,
+      [name, ingredients, price, kcal, category, image_url],
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // STATIC FILES
