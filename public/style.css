@@ -12,195 +12,212 @@
   --second-font: "Unbounded", sans-serif;
 }
 
-/* GENERAL */
-body {
-  font-family: var(--body-font);
-  background-color: var(--body-color);
+/* ================= GLOBAL ================= */
+
+* {
   margin: 0;
-  position: relative;
-  overflow-x: auto;
-  overflow-y: auto;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-#nav-img img {
-  border-radius: 50%;
-  height: 100px;
-  display: block;
-  margin: 2rem auto 0 auto;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(#092e1c, #00800d);
-  filter: blur(2px);
-  z-index: -1;
-}
-
-.container {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-/* TITLE */
-.testimonial__title {
-  font-family: var(--second-font);
-  font-size: 2rem;
-  text-align: center;
-  margin-bottom: 24px;
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #111;
   color: white;
 }
 
-/* CARD */
-.testimonial__card {
-  position: relative;
-  border-radius: 10px;
-  overflow: hidden;
-  text-align: center;
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  cursor: pointer;
-  display: inline-block;
-  width: 342px;
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
 }
 
-.testimonial__card:hover {
-  transform: translateY(-8px);
+/* ================= TITLE ================= */
+
+.testimonial__title {
+  text-align: center;
+  font-size: 32px;
+  margin: 40px 0;
+}
+
+/* ================= SWIPER ================= */
+
+.testimonial__swiper {
+  padding-bottom: 40px;
+}
+
+.swiper-slide {
+  width: 260px !important;
+}
+
+/* ================= MENU CARD ================= */
+
+.testimonial__card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  cursor: pointer;
 }
 
 .testimonial__img {
-  display: block;
-  width: 342px;
-  height: 500px;
+  width: 100%;
+  height: 320px;
   object-fit: cover;
+  display: block;
 }
 
-/* Overlay мэдээлэл */
+/* ================= OVERLAY ================= */
+
 .testimonial__overlay {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  padding: 12px;
-  box-sizing: border-box;
-  font-family: var(--second-font);
+  padding: 15px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0));
 }
 
 .testimonial__overlay h3 {
-  margin: 0;
-  font-size: 1.4rem;
+  font-size: 18px;
+  margin-bottom: 4px;
 }
 
 .testimonial__overlay p {
-  font-size: 0.9rem;
-  margin: 4px 0;
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 8px;
 }
 
-/* Price */
-.testimonial__price {
-  font-size: 2rem;
+.testimonial__overlay span {
   font-weight: bold;
-  color: var(--second-color);
+  display: block;
+  margin-bottom: 8px;
 }
 
-/* SWIPER */
-.swiper-button-prev,
-.swiper-button-next {
-  display: none;
-}
-.testimonial__swiper {
-  padding-bottom: 50px;
-}
-.swiper-pagination {
-  bottom: 10px !important;
+/* ================= ORDER BUTTON ================= */
+
+.testimonial__overlay button {
+  background: #ff6600;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
 }
 
-/* RESPONSIVE */
-@media screen and (max-width: 767px) {
-  .testimonial__card {
-    width: 342px;
-    display: inline-block;
-  }
-  .testimonial__img {
-    width: 342px;
-    height: 500px;
-  }
-}
-@media screen and (min-width: 768px) {
-  .testimonial__card {
-    width: auto;
-  }
-}
+.testimonial__overlay button:hover
 
-/* ================== CART ================== */
+/* ================= CART ================= */
+
 .cart {
-  position: relative;
-  max-width: 400px;
-  margin: 20px auto 50px auto; /* checkout-ийн дор */
-  background: #fff;
-  color: #000;
-  padding: 15px;
-  border-radius: 10px;
-  font-family: var(--body-font);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 280px;
+  height: 100vh;
+  background: #1b1b1b;
+  padding: 20px;
+  border-left: 1px solid #333;
+  overflow-y: auto;
 }
 
 .cart h2 {
-  margin-top: 0;
-  font-size: 1.2rem;
-  text-align: center;
+  margin-bottom: 15px;
 }
 
 .cart-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   margin-bottom: 8px;
-  font-size: 0.95rem;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #333;
 }
 
 .cart-remove {
-  color: red;
   cursor: pointer;
-  font-weight: bold;
+  color: red;
 }
 
 .cart-total {
-  margin-top: 10px;
+  margin-top: 15px;
   font-weight: bold;
-  text-align: right;
 }
+
+/* ================= CART INPUT ================= */
 
 .cart input {
   width: 100%;
-  padding: 6px;
+  padding: 8px;
   margin-top: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  border: none;
+  border-radius: 6px;
 }
 
+/* ================= CART BUTTON ================= */
+
 .cart button {
-  width: 100%;
   margin-top: 10px;
-  padding: 8px;
+  width: 100%;
+  padding: 10px;
+  background: #00b33c;
   border: none;
-  background: var(--second-color);
+  border-radius: 6px;
   color: white;
-  border-radius: 5px;
   cursor: pointer;
 }
 
-/* RESPONSIVE CART */
-@media screen and (max-width: 767px) {
+.cart button:hover
+
+/* ================= PAGINATION ================= */
+
+.swiper-pagination-bullet {
+  background: white;
+  opacity: 0.4;
+}
+
+.swiper-pagination-bullet-active {
+  opacity: 1;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
   .cart {
-    width: 90%;
-    padding: 12px;
+    width: 240px;
+  }
+
+  .swiper-slide {
+    width: 220px !important;
+  }
+
+  .testimonial__img {
+    height: 280px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 95%;
+  }
+
+  .cart {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border: none;
+    margin-top: 30px;
+  }
+
+  .swiper-slide {
+    width: 180px !important;
+  }
+
+  .testimonial__img {
+    height: 220px;
+  }
+
+  .testimonial__overlay h3 {
+    font-size: 16px;
   }
 }

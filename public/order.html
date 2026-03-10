@@ -2,7 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Orders</title>
+    <title>Kitchen Orders</title>
+
     <style>
       body {
         font-family: Arial;
@@ -10,101 +11,185 @@
         color: white;
         padding: 20px;
       }
+
+      h1 {
+        margin-bottom: 20px;
+      }
+
       .order {
         background: #222;
         padding: 15px;
         margin-bottom: 20px;
         border-radius: 10px;
       }
+
       table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 10px;
       }
+
       th,
       td {
         border: 1px solid #444;
         padding: 8px;
         text-align: left;
       }
+
       th {
         background: #333;
       }
+
       img {
         width: 50px;
         height: 50px;
         object-fit: cover;
         border-radius: 5px;
       }
+
       button {
-        padding: 6px 12px;
-        background: green;
+        padding: 8px 14px;
+        background: #00b33c;
         border: none;
         color: white;
         cursor: pointer;
-        border-radius: 5px;
+        border-radius: 6px;
+        margin-top: 10px;
       }
+
       .timer {
-        font-style: italic;
         color: #0f0;
+        margin-top: 5px;
+      }
+
+      @media (max-width: 700px) {
+        table {
+          font-size: 12px;
+        }
+
+        img {
+          width: 35px;
+          height: 35px;
+        }
       }
     </style>
   </head>
+
   <body>
-    <h1>Orders</h1>
+    <h1>Kitchen Orders</h1>
+
     <div id="orders"></div>
+
     <script>
       async function loadOrders() {
-        const div = document.getElementById("orders");
-        div.innerHTML = "";
+        const container = document.getElementById("orders");
+        container.innerHTML = "";
+
         try {
           const res = await fetch("/orders");
-          const data = await res.json();
-          data.forEach((order) => {
-            if (order.status === "done") return; // done бол үзүүлэхгүй
-            const orderDiv = document.createElement("div");
-            orderDiv.className = "order";
-            let html = `
-        <h3>Table: ${order.table_number}</h3>
-        <p>Status: ${order.status}</p>
-        <p>Ordered at: ${new Date(order.created_at).toLocaleString()}</p>
-        <p class="timer" id="timer-${order.id}">Elapsed: 0s</p>
-        <table>
-          <thead><tr><th>Image</th><th>Name</th><th>Price</th></tr></thead><tbody>`;
-            order.items.forEach((item) => {
-              html += `<tr>
-          <td>${item.image_url ? `<img src="${item.image_url}">` : "-"}</td>
-          <td>${item.name}</td>
-          <td>${item.price}₮</td>
-        </tr>`;
-            });
-            html += `</tbody></table>
-        <p><strong>Total: ${order.total_price}₮</strong></p>
-        <button onclick="markDone(${order.id})">DONE</button>`;
-            orderDiv.innerHTML = html;
-            div.appendChild(orderDiv);
 
-            // Timer
-            const startTime = new Date(order.created_at).getTime();
-            const timerEl = document.getElementById(`timer-${order.id}`);
-            setInterval(() => {
-              const elapsed = Math.floor((Date.now() - startTime) / 1000);
-              const min = Math.floor(elapsed / 60);
-              const sec = elapsed % 60;
-              timerEl.innerText = `Elapsed: ${min}m ${sec}s`;
-            }, 1000);
+          if (!res.ok) {
+            console.error("Server error");
+            return;
+          }
+
+          const data = await res.json();
+
+          data.forEach((order) => {
+            if (order.status === "done") return;
+
+            let items = order.items;
+
+            if (typeof items === "string") {
+              items = JSON.parse(items);
+            }
+
+            const div = document.createElement("div");
+            div.className = "order";
+
+            let html = `
+
+<h3>Table ${order.table_number}</h3>
+
+<p>Status: ${order.status}</p>
+
+<p>Ordered: ${new Date(order.created_at).toLocaleTimeString()}</p>
+
+<p class="timer" id="timer-${order.id}">Elapsed: 0s</p>
+
+<table>
+
+<thead>
+<tr>
+<th>Image</th>
+<th>Name</th>
+<th>Price</th>
+</tr>
+</thead>
+
+<tbody>
+`;
+
+            items.forEach((item) => {
+              html += `
+<tr>
+<td>${item.image_url ? `<img src="${item.image_url}">` : "-"}</td>
+<td>${item.name}</td>
+<td>${item.price}₮</td>
+</tr>
+`;
+            });
+
+            html += `
+</tbody>
+</table>
+
+<p><strong>Total: ${order.total_price}₮</strong></p>
+
+<button onclick="markDone(${order.id})">DONE</button>
+`;
+
+            div.innerHTML = html;
+
+            container.appendChild(div);
+
+            startTimer(order);
           });
+        } catch (err) {
+          console.error("Load orders error:", err);
+        }
+      }
+
+      function startTimer(order) {
+        const startTime = new Date(order.created_at).getTime();
+        const el = document.getElementById(`timer-${order.id}`);
+
+        if (!el) return;
+
+        setInterval(() => {
+          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+
+          const m = Math.floor(elapsed / 60);
+          const s = elapsed % 60;
+
+          el.innerText = `Elapsed: ${m}m ${s}s`;
+        }, 1000);
+      }
+
+      async function markDone(id) {
+        try {
+          await fetch("/orders/" + id, {
+            method: "PUT",
+          });
+
+          loadOrders();
         } catch (err) {
           console.error(err);
         }
       }
 
-      async function markDone(id) {
-        await fetch("/orders/" + id, { method: "PUT" });
-        loadOrders();
-      }
-
       loadOrders();
+
       setInterval(loadOrders, 5000);
     </script>
   </body>
