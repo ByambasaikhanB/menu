@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const upload = multer({ dest: "tmp/" });
 
-// ================= DB INIT =================
+// ================= CREATE TABLE =================
 async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS menu_items (
@@ -41,38 +41,36 @@ async function initDB() {
       category TEXT
     );
   `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS orders (
-      id SERIAL PRIMARY KEY,
-      customer_name TEXT,
-      phone TEXT,
-      items JSONB,
-      total_price TEXT,
-      created_at TIMESTAMP DEFAULT NOW()
-    );
-  `);
 }
 initDB();
 
-// ================= MENU API =================
+// =================================================
+// ================= API ROUTES ====================
+// =================================================
+
+// GET ALL
 app.get("/menu", async (req, res) => {
   const result = await pool.query("SELECT * FROM menu_items ORDER BY id DESC");
   res.json(result.rows);
 });
 
+// GET BY CATEGORY (CASE INSENSITIVE)
 app.get("/menu/:category", async (req, res) => {
   const result = await pool.query(
-    "SELECT * FROM menu_items WHERE LOWER(category)=LOWER($1)",
+    "SELECT * FROM menu_items WHERE LOWER(category)=LOWER($1) ORDER BY id DESC",
     [req.params.category],
   );
   res.json(result.rows);
 });
 
-// ================= ADD MENU =================
+// ADD
 app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
     let { name, ingredients, price, kcal, icons, category } = req.body;
+
+    name = name.toUpperCase();
+    ingredients = ingredients ? ingredients.toUpperCase() : null;
+    category = category.toLowerCase();
 
     let image_url = null;
 
@@ -84,48 +82,91 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
       fs.unlinkSync(req.file.path);
     }
 
-    const db = await pool.query(
-      `INSERT INTO menu_items
-      (image_url,name,ingredients,price,kcal,icons,category)
-      VALUES ($1,$2,$3,$4,$5,$6,$7)
-      RETURNING *`,
-      [image_url, name, ingredients, price, kcal, icons, category],
-    );
-
-    res.json(db.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: true });
-  }
-});
-
-// ================= ORDER API =================
-app.post("/order", async (req, res) => {
-  try {
-    const { customer_name, phone, items, total_price } = req.body;
-
     const result = await pool.query(
-      `INSERT INTO orders (customer_name, phone, items, total_price)
-       VALUES ($1,$2,$3,$4)
+      `INSERT INTO menu_items
+       (image_url,name,ingredients,price,kcal,icons,category)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)
        RETURNING *`,
-      [customer_name, phone, JSON.stringify(items), total_price],
+      [
+        image_url,
+        name,
+        ingredients,
+        price,
+        kcal || null,
+        icons || null,
+        category,
+      ],
     );
 
-    res.json({ success: true, order: result.rows[0] });
+    res.json({ success: true, item: result.rows[0] });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false });
   }
 });
 
-// ================= GET ORDERS =================
-app.get("/orders", async (req, res) => {
-  const result = await pool.query("SELECT * FROM orders ORDER BY id DESC");
-  res.json(result.rows);
+// UPDATE
+app.put("/menu/:id", upload.single("image"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    let { name, ingredients, price, kcal, icons, category } = req.body;
+
+    name = name.toUpperCase();
+    ingredients = ingredients ? ingredients.toUpperCase() : null;
+    category = category.toLowerCase();
+
+    let image_url = null;
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "menu_items",
+      });
+      image_url = result.secure_url;
+      fs.unlinkSync(req.file.path);
+    }
+
+    if (image_url) {
+      await pool.query(
+        `UPDATE menu_items
+         SET name=$1, ingredients=$2, price=$3,
+             kcal=$4, icons=$5, category=$6, image_url=$7
+         WHERE id=$8`,
+        [
+          name,
+          ingredients,
+          price,
+          kcal || null,
+          icons || null,
+          category,
+          image_url,
+          id,
+        ],
+      );
+    } else {
+      await pool.query(
+        `UPDATE menu_items
+         SET name=$1, ingredients=$2, price=$3,
+             kcal=$4, icons=$5, category=$6
+         WHERE id=$7`,
+        [name, ingredients, price, kcal || null, icons || null, category, id],
+      );
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
 });
 
-// ================= STATIC =================
+// DELETE
+app.delete("/menu/:id", async (req, res) => {
+  await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
+  res.json({ success: true });
+});
+
+// ================= STATIC LAST =================
 app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Server running " + PORT));
+app.listen(PORT, () => console.log("Server running on port " + PORT));
