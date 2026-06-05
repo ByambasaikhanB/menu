@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ирсэн Захиалгууд</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="orders-container">
+      <div class="header-area">
+        <a href="menu-food.html" class="back-link">← Цэс рүү буцах</a>
+        <h1>Ирсэн Захиалгын Жагсаалт</h1>
+        <button class="clear-btn" id="clearBtn" onclick="clearOrders()">
+          Жагсаалт цэвэрлэх
+        </button>
+      </div>
+
+      <table id="ordersTable" class="orders-table">
+        <thead>
+          <tr>
+            <th style="width: 50px">№</th>
+            <th>Огноо</th>
+            <th>Үйлчлүүлэгч</th>
+            <th>Утасны дугаар</th>
+            <th>Хоолны нэр</th>
+            <th>Нэгж үнэ</th>
+            <th>Тоо ширхэг</th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody"></tbody>
+      </table>
+      <div id="noOrdersMessage" class="no-orders" style="display: none">
+        Одоогоор ирсэн захиалга байхгүй байна.
+      </div>
+    </div>
+
+    <script>
+      function displayOrders() {
+        const ordersBody = document.getElementById("ordersBody");
+        const noOrdersMessage = document.getElementById("noOrdersMessage");
+        const ordersTable = document.getElementById("ordersTable");
+        const clearBtn = document.getElementById("clearBtn");
+
+        let orders =
+          JSON.parse(localStorage.getItem("restaurant_orders")) || [];
+        ordersBody.innerHTML = "";
+
+        if (orders.length === 0) {
+          noOrdersMessage.style.display = "block";
+          ordersTable.style.display = "none";
+          clearBtn.style.display = "none";
+          return;
+        }
+
+        noOrdersMessage.style.display = "none";
+        ordersTable.style.display = "table";
+        clearBtn.style.display = "block";
+
+        orders.reverse().forEach((order, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td><b>${index + 1}</b></td>
+            <td>${order.date}</td>
+            <td>${order.clientName}</td>
+            <td><a href="tel:${order.clientPhone}" class="order-phone-link">${order.clientPhone}</a></td>
+            <td style="font-weight: 600;">${order.foodName}</td>
+            <td>${order.foodPrice}</td>
+            <td><span class="order-qty-badge">${order.quantity} ш</span></td>
+        `;
+          ordersBody.appendChild(row);
+        });
+      }
+
+      function clearOrders() {
+        if (confirm("Та бүх захиалгыг устгахдаа итгэлтэй байна уу?")) {
+          localStorage.removeItem("restaurant_orders");
+          displayOrders();
+        }
+      }
+
+      window.onload = displayOrders;
+    </script>
+  </body>
+</html>

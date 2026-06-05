@@ -10,6 +10,7 @@
   --container-color: #fff;
   --body-font: "Montserrat", sans-serif;
   --second-font: "Unbounded", sans-serif;
+  --hotel-brand-color: #531723; /* Зориулалтын тансаг өнгө */
 }
 
 /* GENERAL */
@@ -86,9 +87,14 @@ body::before {
   bottom: 0;
   left: 0;
   width: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(
+    0,
+    0,
+    0,
+    0.7
+  ); /* Текстийг илүү тод харагдуулах үүднээс бага зэрэг бараан болгов */
   color: #fff;
-  padding: 12px;
+  padding: 16px 12px 12px 12px; /* Товчлуур багтах зай авсан */
   box-sizing: border-box;
   font-family: var(--second-font);
 }
@@ -135,6 +141,36 @@ body::before {
   color: #fff;
 }
 
+/* КАРТ ДЭЭРХ ЗАХИАЛАХ ТОВЧЛУУР */
+.menu-order-btn {
+  background-color: var(
+    --second-color
+  ); /* Вэбийн үндсэн тод улбар шар өнгөөр уусгав */
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-family: var(--second-font);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 12px;
+  width: 100%;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
+  text-transform: uppercase;
+}
+
+.menu-order-btn:hover {
+  background-color: hsl(18, 88%, 48%);
+  transform: translateY(-1px);
+}
+
+.menu-order-btn:active {
+  transform: translateY(1px);
+}
+
 /* SWIPER */
 .swiper-button-prev,
 .swiper-button-next {
@@ -147,9 +183,250 @@ body::before {
   bottom: 10px !important;
 }
 
-/* RESPONSIVE */
+/* ================================================================= */
+/* ЗАХИАЛГА ХИЙХ POP-UP МОДАЛЫН ЗАГВАР                             */
+/* ================================================================= */
+.custom-modal {
+  display: none;
+  position: fixed;
+  z-index: 99999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
 
-/* Mobile-д desktop шиг card харагдуулах */
+.modal-content {
+  background-color: #ffffff;
+  margin: 12% auto;
+  padding: 30px;
+  border: none;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  animation: animatetop 0.3s ease-out;
+  font-family: var(--body-font);
+}
+
+@keyframes animatetop {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-btn {
+  color: #999;
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-title {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 2px solid #f4f4f4;
+  padding-bottom: 10px;
+  font-family: var(--second-font);
+  font-size: 1.3rem;
+}
+
+.modal-food-name {
+  font-family: var(--second-font);
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: var(--hotel-brand-color);
+  margin: 15px 0 5px 0;
+}
+
+.modal-food-price {
+  color: var(--second-color);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #444;
+  font-size: 0.9rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: var(--body-font);
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  border-color: var(--second-color);
+  outline: none;
+}
+
+.submit-order-btn {
+  background-color: var(--hotel-brand-color);
+  color: white;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  font-family: var(--second-font);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.submit-order-btn:hover {
+  background-color: #3d1019;
+}
+
+/* ================================================================= */
+/* ИРСЭН ЗАХИАЛГЫН ХУУДАСНЫ ЗАГВАРУУД (ORDERS.HTML)                  */
+/* ================================================================= */
+.orders-container {
+  max-width: 1100px;
+  margin: 30px auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.header-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #f1f1f1;
+  padding-bottom: 20px;
+  margin-bottom: 25px;
+}
+
+.header-area h1 {
+  margin: 0;
+  color: var(--hotel-brand-color);
+  font-family: var(--second-font);
+  font-size: 1.8rem;
+}
+
+.back-link {
+  color: var(--hotel-brand-color);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--body-font);
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: white;
+  font-family: var(--body-font);
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.orders-table th {
+  background-color: #fdfbfc;
+  color: var(--hotel-brand-color);
+  font-family: var(--second-font);
+  font-weight: 600;
+  border-bottom: 2px solid #e9ecef;
+  font-size: 0.85rem;
+}
+
+.orders-table tr:hover {
+  background-color: #fffafb;
+}
+
+.order-phone-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.order-phone-link:hover {
+  text-decoration: underline;
+}
+
+.order-qty-badge {
+  background: #f1f1f1;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.no-orders {
+  text-align: center;
+  padding: 50px 20px;
+  color: #999;
+  font-style: italic;
+  font-size: 1.1rem;
+  font-family: var(--body-font);
+}
+
+.clear-btn {
+  background-color: #dc3545;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: var(--second-font);
+  transition: background-color 0.2s;
+}
+
+.clear-btn:hover {
+  background-color: #bd2130;
+}
+
+/* RESPONSIVE & MOBILE MEDIA QUERIES */
+
+/* Mobile-д desktop шиг card харагдуулах болон Захиалгын хүснэгтийг жагсаалт болгох */
 @media screen and (max-width: 767px) {
   .testimonial__card {
     width: 342px; /* desktop width */
@@ -159,6 +436,78 @@ body::before {
   .testimonial__img {
     width: 342px;
     height: 500px;
+  }
+
+  /* Orders.html-ийн гар утасны зохицуулалт */
+  .orders-container {
+    margin: 15px;
+    padding: 15px;
+  }
+  .header-area {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .orders-table,
+  .orders-table thead,
+  .orders-table tbody,
+  .orders-table th,
+  .orders-table td,
+  .orders-table tr {
+    display: block;
+  }
+  .orders-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  .orders-table tr {
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fff;
+  }
+  .orders-table td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 50%;
+    text-align: right;
+  }
+  .orders-table td:last-child {
+    border-bottom: none;
+  }
+  .orders-table td:before {
+    position: absolute;
+    left: 15px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+    color: var(--hotel-brand-color);
+  }
+  .orders-table td:nth-of-type(1):before {
+    content: "№";
+  }
+  .orders-table td:nth-of-type(2):before {
+    content: "Огноо";
+  }
+  .orders-table td:nth-of-type(3):before {
+    content: "Үйлчлүүлэгч";
+  }
+  .orders-table td:nth-of-type(4):before {
+    content: "Утас";
+  }
+  .orders-table td:nth-of-type(5):before {
+    content: "Хоол";
+  }
+  .orders-table td:nth-of-type(6):before {
+    content: "Үнэ";
+  }
+  .orders-table td:nth-of-type(7):before {
+    content: "Тоо ширхэг";
   }
 }
 

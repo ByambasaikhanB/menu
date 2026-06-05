@@ -19,7 +19,6 @@
       />
     </div>
 
-    <!-- food-menu.html -->
     <section class="testimonial container">
       <h2 class="testimonial__title">Food Menu</h2>
       <div class="testimonial__swiper swiper">
@@ -27,9 +26,115 @@
         <div class="swiper-pagination"></div>
       </div>
     </section>
+
+    <div id="orderModal" class="custom-modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeOrderModal()">&times;</span>
+        <h2 class="modal-title">Хоол Захиалга</h2>
+        <div class="modal-body">
+          <p id="modalFoodName" class="modal-food-name"></p>
+          <p id="modalFoodPrice" class="modal-food-price"></p>
+
+          <form id="orderForm" onsubmit="submitOrder(event)">
+            <div class="form-group">
+              <label for="clientName">Таны нэр:</label>
+              <input
+                type="text"
+                id="clientName"
+                required
+                placeholder="Нэрээ оруулна уу"
+              />
+            </div>
+            <div class="form-group">
+              <label for="clientPhone">Утасны дугаар:</label>
+              <input
+                type="tel"
+                id="clientPhone"
+                required
+                placeholder="Утасны дугаар"
+              />
+            </div>
+            <div class="form-group">
+              <label for="foodQuantity">Тоо ширхэг:</label>
+              <input
+                type="number"
+                id="foodQuantity"
+                min="1"
+                value="1"
+                required
+              />
+            </div>
+            <button type="submit" class="submit-order-btn">
+              Захиалга баталгаажуулах
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <script src="app.js"></script>
+
     <script>
+      // Захиалга хийх үеийн түр хадгалах хувьсагч
+      let currentSelectedFood = { name: "", price: "" };
+
+      // Хоолны карт дээрх "Захиалах" товчийг дарахад модал нээх функц
+      function openOrderModal(foodName, foodPrice) {
+        currentSelectedFood.name = foodName;
+        currentSelectedFood.price = foodPrice;
+
+        document.getElementById("modalFoodName").innerText =
+          "Хоол: " + foodName;
+        document.getElementById("modalFoodPrice").innerText =
+          "Үнэ: " + foodPrice;
+        document.getElementById("orderModal").style.display = "block";
+      }
+
+      // Модалыг хаах болон формыг цэвэрлэх функц
+      function closeOrderModal() {
+        document.getElementById("orderModal").style.display = "none";
+        document.getElementById("orderForm").reset();
+      }
+
+      // Захиалгыг хөтчийн санах ой (localStorage)-д хадгалах функц
+      function submitOrder(event) {
+        event.preventDefault();
+
+        const clientName = document.getElementById("clientName").value;
+        const clientPhone = document.getElementById("clientPhone").value;
+        const quantity = document.getElementById("foodQuantity").value;
+        const orderDate = new Date().toLocaleString("mn-MN");
+
+        const newOrder = {
+          foodName: currentSelectedFood.name,
+          foodPrice: currentSelectedFood.price,
+          clientName: clientName,
+          clientPhone: clientPhone,
+          quantity: quantity,
+          date: orderDate,
+        };
+
+        // Өмнөх захиалгуудын жагсаалт дээр шинэ захиалгыг нэмэх
+        let orders =
+          JSON.parse(localStorage.getItem("restaurant_orders")) || [];
+        orders.push(newOrder);
+
+        localStorage.setItem("restaurant_orders", JSON.stringify(orders));
+
+        alert("Захиалга амжилттай бүртгэгдлээ!");
+        closeOrderModal();
+      }
+
+      // Модалын гадна талын хар дэвсгэр дээр дарахад хаах
+      window.onclick = function (event) {
+        const modal = document.getElementById("orderModal");
+        if (event.target == modal) {
+          closeOrderModal();
+        }
+      };
+
+      // Төслийн анхны хоол ачаалах функцыг дуудах
       loadMenu("food");
     </script>
   </body>
