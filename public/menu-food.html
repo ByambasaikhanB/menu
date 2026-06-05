@@ -28,7 +28,7 @@
     </section>
 
     <div class="floating-cart-btn" onclick="openCartModal()">
-      <span>🛒 Сагс</span>
+      <span>🛒 Сагс & Төлөв</span>
       <span id="cartCountBadge" class="cart-count-badge">0</span>
     </div>
 
@@ -40,7 +40,7 @@
         <div class="modal-body">
           <div id="cartItemsList" class="cart-items-list"></div>
 
-          <div class="cart-total-area">
+          <div id="cartTotalWrapper" class="cart-total-area">
             <span>Нийт дүн:</span>
             <span id="cartTotalAmount" class="cart-total-amount">0₮</span>
           </div>
@@ -78,6 +78,15 @@
               Захиалга баталгаажуулах
             </button>
           </form>
+
+          <div
+            id="myOrdersStatusSection"
+            class="customer-status-section"
+            style="display: none"
+          >
+            <h3 class="status-section-title">⚡ Миний захиалгын төлөв</h3>
+            <div id="customerOrdersList"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -86,13 +95,11 @@
     <script src="app.js"></script>
 
     <script>
-      // Хуудас ачаалагдахад сагсны тэмдэгтийг шинэчлэх
       window.onload = function () {
         updateCartBadge();
         loadMenu("food");
       };
 
-      // Модалын гадна талын хар дэвсгэр дээр дарахад хаах
       window.onclick = function (event) {
         const modal = document.getElementById("orderModal");
         if (event.target == modal) {

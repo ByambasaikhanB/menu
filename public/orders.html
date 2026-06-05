@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Захиалгын хянах самбар</title>
+    <title>Захиалгын хянах самбар (Гал тогоо)</title>
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body style="background: #f4f6f9; padding: 20px">
     <div class="orders-container">
       <div class="header-area">
-        <h1>Ирсэн захиалгууд (Гал тогоо / Админ)</h1>
+        <h1>Ирсэн захиалгууд (Гал тогоо / Админ Самбар)</h1>
         <button class="clear-btn" onclick="clearAllOrders()">
           Бүх захиалгыг устгах
         </button>
@@ -33,7 +33,7 @@
         <tbody id="ordersBody"></tbody>
       </table>
       <div id="noOrdersMessage" class="no-orders" style="display: none">
-        Одоогоор захиалга байхгүй байна.
+        Одоогоор ирсэн захиалга байхгүй байна.
       </div>
     </div>
 
@@ -57,7 +57,6 @@
         noOrdersMsg.style.display = "none";
 
         orders.forEach((order, index) => {
-          // Төлөвөөс хамаарч өөр өнгөтэй CSS класс оноох
           let statusClass = "status-pending";
           if (order.status === "Хийгдэж буй") statusClass = "status-cooking";
           if (order.status === "Бэлэн болсон") statusClass = "status-ready";
@@ -84,18 +83,15 @@
         });
       }
 
-      // ТӨЛӨВ ШИНЭЧЛЭХ ФУНКЦ
       function updateStatus(orderId, newStatus) {
         let orders =
           JSON.parse(localStorage.getItem("restaurant_orders")) || [];
-
         orders = orders.map((order) => {
           if (order.id === orderId) {
             order.status = newStatus;
           }
           return order;
         });
-
         localStorage.setItem("restaurant_orders", JSON.stringify(orders));
         renderOrders();
       }

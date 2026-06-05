@@ -19,7 +19,7 @@ body {
   background-color: var(--body-color);
   margin: 0;
   position: relative;
-  overflow-x: auto; /* mobile-д хөндлөн scroll зөвшөөрөх */
+  overflow-x: auto;
   overflow-y: auto;
 }
 
@@ -73,7 +73,6 @@ body::before {
 .testimonial__card:hover {
   transform: translateY(-8px);
 }
-
 .testimonial__img {
   display: block;
   width: 342px;
@@ -81,7 +80,6 @@ body::before {
   object-fit: cover;
 }
 
-/* Overlay мэдээлэл */
 .testimonial__overlay {
   position: absolute;
   bottom: 0;
@@ -93,50 +91,40 @@ body::before {
   box-sizing: border-box;
   font-family: var(--second-font);
 }
-
-/* Overlay текст */
 .testimonial__overlay h3 {
   margin: 0;
   font-size: 1.4rem;
 }
-
 .testimonial__overlay p {
   font-size: 0.9rem;
   margin: 4px 0;
 }
-
-/* Price + icons мөр */
 .testimonial__extra {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 8px;
 }
-
 .testimonial__price-icons {
   display: flex;
   align-items: center;
   gap: 6px;
 }
-
 .testimonial__price {
   font-size: 2rem;
   font-weight: bold;
   color: var(--second-color);
 }
-
 .testimonial__icons {
   font-size: 1.5rem;
   display: flex;
   gap: 4px;
 }
-
 .testimonial__kcal {
   font-style: italic;
   color: #fff;
 }
 
-/* КАРТ ДЭЭРХ ЗАХИАЛАХ ТОВЧЛУУР */
 .menu-order-btn {
   background-color: var(--second-color);
   color: white;
@@ -154,12 +142,10 @@ body::before {
     transform 0.1s;
   text-transform: uppercase;
 }
-
 .menu-order-btn:hover {
   background-color: hsl(18, 88%, 48%);
   transform: translateY(-1px);
 }
-
 .menu-order-btn:active {
   transform: translateY(1px);
 }
@@ -176,9 +162,7 @@ body::before {
   bottom: 10px !important;
 }
 
-/* ================================================================= */
-/* ЗАХИАЛГА ХИЙХ POP-UP МОДАЛЫН ЗАГВАР                             */
-/* ================================================================= */
+/* MODAL CONFIG */
 .custom-modal {
   display: none;
   position: fixed;
@@ -191,7 +175,6 @@ body::before {
   background-color: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
 }
-
 .modal-content {
   background-color: #ffffff;
   margin: 12% auto;
@@ -206,7 +189,6 @@ body::before {
   font-family: var(--body-font);
   box-sizing: border-box;
 }
-
 @keyframes animatetop {
   from {
     transform: translateY(-30px);
@@ -217,7 +199,6 @@ body::before {
     opacity: 1;
   }
 }
-
 .close-btn {
   color: #999;
   position: absolute;
@@ -229,11 +210,9 @@ body::before {
   transition: color 0.2s;
   line-height: 1;
 }
-
 .close-btn:hover {
   color: #333;
 }
-
 .modal-title {
   margin-top: 0;
   color: #333;
@@ -247,7 +226,6 @@ body::before {
   margin-bottom: 16px;
   text-align: left;
 }
-
 .form-group label {
   display: block;
   margin-bottom: 6px;
@@ -255,7 +233,6 @@ body::before {
   color: #444;
   font-size: 0.9rem;
 }
-
 .form-group input {
   width: 100%;
   padding: 10px 12px;
@@ -266,7 +243,6 @@ body::before {
   font-family: var(--body-font);
   transition: border-color 0.2s;
 }
-
 .form-group input:focus {
   border-color: var(--second-color);
   outline: none;
@@ -286,14 +262,11 @@ body::before {
   transition: background-color 0.2s;
   margin-top: 10px;
 }
-
 .submit-order-btn:hover {
   background-color: #3d1019;
 }
 
-/* ================================================================= */
-/* ИРСЭН ЗАХИАЛГЫН ХУУДАСНЫ ЗАГВАРУУД (ORDERS.HTML)                  */
-/* ================================================================= */
+/* ORDERS ADMIN SIDE */
 .orders-container {
   max-width: 1100px;
   margin: 30px auto;
@@ -302,7 +275,6 @@ body::before {
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
-
 .header-area {
   display: flex;
   justify-content: space-between;
@@ -311,14 +283,12 @@ body::before {
   padding-bottom: 20px;
   margin-bottom: 25px;
 }
-
 .header-area h1 {
   margin: 0;
   color: var(--hotel-brand-color);
   font-family: var(--second-font);
   font-size: 1.8rem;
 }
-
 .orders-table {
   width: 100%;
   border-collapse: collapse;
@@ -326,7 +296,6 @@ body::before {
   background: white;
   font-family: var(--body-font);
 }
-
 .orders-table th,
 .orders-table td {
   padding: 14px 16px;
@@ -334,7 +303,6 @@ body::before {
   border-bottom: 1px solid #eee;
   font-size: 0.95rem;
 }
-
 .orders-table th {
   background-color: #fdfbfc;
   color: var(--hotel-brand-color);
@@ -343,23 +311,19 @@ body::before {
   border-bottom: 2px solid #e9ecef;
   font-size: 0.85rem;
 }
-
 .orders-table tr:hover {
   background-color: #fffafb;
 }
-
 .order-phone-link {
   color: #007bff;
   text-decoration: none;
 }
-
 .order-qty-badge {
   background: #f1f1f1;
   padding: 3px 8px;
   border-radius: 4px;
   font-weight: 600;
 }
-
 .no-orders {
   text-align: center;
   padding: 50px 20px;
@@ -368,7 +332,6 @@ body::before {
   font-size: 1.1rem;
   font-family: var(--body-font);
 }
-
 .clear-btn {
   background-color: #dc3545;
   color: white;
@@ -381,7 +344,6 @@ body::before {
   font-family: var(--second-font);
   transition: background-color 0.2s;
 }
-
 .clear-btn:hover {
   background-color: #bd2130;
 }
@@ -405,7 +367,6 @@ body::before {
     align-items: flex-start;
     gap: 15px;
   }
-
   .orders-table,
   .orders-table thead,
   .orders-table tbody,
@@ -477,16 +438,13 @@ body::before {
     content: "Үйлдэл";
   }
 }
-
 @media screen and (min-width: 768px) {
   .testimonial__card {
     width: auto;
   }
 }
 
-/* ================================================================= */
-/* САГСНЫ СИСТЕМ БОЛОН АДМИН ТӨЛӨВИЙН ЗАГВАРУУД                       */
-/* ================================================================= */
+/* CART & LIVE STATUS STYLES */
 .floating-cart-btn {
   position: fixed;
   bottom: 25px;
@@ -512,7 +470,6 @@ body::before {
   transform: scale(1.05);
   background-color: hsl(18, 88%, 48%);
 }
-
 .cart-count-badge {
   background-color: var(--hotel-brand-color);
   color: white;
@@ -527,7 +484,6 @@ body::before {
   border: 2px solid white;
   box-sizing: border-box;
 }
-
 .modal-content--cart {
   max-width: 480px !important;
 }
@@ -562,7 +518,6 @@ body::before {
   color: var(--second-color);
   font-weight: 600;
 }
-
 .cart-item-actions {
   display: flex;
   align-items: center;
@@ -597,7 +552,6 @@ body::before {
   padding: 0;
   margin-left: 5px;
 }
-
 .cart-total-area {
   display: flex;
   justify-content: space-between;
@@ -615,7 +569,7 @@ body::before {
   color: var(--hotel-brand-color);
 }
 
-/* Төлөв заах тэмдэгүүд (Badges) */
+/* BADGES */
 .status-badge {
   padding: 5px 10px;
   border-radius: 4px;
@@ -640,7 +594,7 @@ body::before {
   border: 1px solid #c3e6cb;
 }
 
-/* Админ товчлуурууд */
+/* ACTION BUTTONS (ADMIN) */
 .action-buttons {
   display: flex;
   gap: 5px;
@@ -665,9 +619,36 @@ body::before {
 .btn-status-ready {
   background-color: #28a745;
 }
-
 @media screen and (max-width: 767px) {
   .action-buttons {
     justify-content: flex-end;
   }
+}
+
+/* ҮЙЛЧЛҮҮЛЭГЧИЙН ХАРАХ ТӨЛӨВИЙН ДИЗАЙН (ШИНЭ) */
+.customer-status-section {
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 2px solid #eee;
+  text-align: left;
+}
+.status-section-title {
+  font-family: var(--second-font);
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 12px;
+}
+.customer-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fdfdfd;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+  margin-bottom: 8px;
+}
+.customer-status-info {
+  font-family: var(--body-font);
+  font-size: 0.9rem;
 }

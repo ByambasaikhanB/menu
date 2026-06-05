@@ -16,14 +16,13 @@ const swiper = new Swiper(".testimonial__swiper", {
   preventClicksPropagation: true,
 });
 
-// Сагсны өгөгдөл (Array)
+// Сагсны өгөгдөл
 let cart = JSON.parse(localStorage.getItem("restaurant_cart")) || [];
 
 async function loadMenu(category) {
   try {
     const res = await fetch(`/menu/${category}`);
     const data = await res.json();
-
     wrapper.innerHTML = "";
 
     data.forEach((item) => {
@@ -48,13 +47,7 @@ async function loadMenu(category) {
                 <span class="testimonial__price">${formattedPrice}</span>
                 <span class="testimonial__icons">${icons}</span>
               </div>
-              ${
-                kcal !== null &&
-                kcal !== undefined &&
-                String(kcal).trim() !== ""
-                  ? `<span class="testimonial__kcal">${kcal} kcal</span>`
-                  : ""
-              }
+              ${kcal ? `<span class="testimonial__kcal">${kcal} kcal</span>` : ""}
             </div>
             <button class="menu-order-btn" onclick="event.stopPropagation(); addToCart('${safeFoodName}', ${price})">
                 Сагсанд нэмэх 🛒
@@ -63,7 +56,6 @@ async function loadMenu(category) {
         </div>
       `;
     });
-
     setTimeout(() => {
       swiper.update();
     }, 100);
@@ -72,70 +64,111 @@ async function loadMenu(category) {
   }
 }
 
-// 1. САГСАНД ХООЛ НЭМЭХ ФУНКЦ
 function addToCart(foodName, foodPrice) {
   const existingItem = cart.find((item) => item.name === foodName);
-
   if (existingItem) {
     existingItem.quantity += 1;
   } else {
     cart.push({ name: foodName, price: foodPrice, quantity: 1 });
   }
-
   saveCart();
   updateCartBadge();
   alert(`${foodName} сагсанд нэмэгдлээ!`);
 }
 
-// 2. САГСНЫ БЭДЖ (Badge) ШИНЭЧЛЭХ
 function updateCartBadge() {
   const badge = document.getElementById("cartCountBadge");
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   badge.innerText = totalItems;
 }
 
-// 3. САГСНЫ МОДАЛ НЭЭХ (Сагсан дахь хоолыг зурах)
+// САГСНЫ МОДАЛ НЭЭХ БОЛОН ТӨЛӨВ ХАРАГДУУЛАХ ХЭСЭГ
 function openCartModal() {
   const cartList = document.getElementById("cartItemsList");
   const totalAmountSpan = document.getElementById("cartTotalAmount");
+  const totalWrapper = document.getElementById("cartTotalWrapper");
+  const orderForm = document.getElementById("orderForm");
 
+  // 1. Сагсанд байгаа хоолыг зурах
   cartList.innerHTML = "";
-
   if (cart.length === 0) {
     cartList.innerHTML =
-      '<p style="text-align:center; color:#999; font-style: italic;">Сагс хоосон байна.</p>';
-    totalAmountSpan.innerText = "0₮";
-    document.getElementById("orderModal").style.display = "block";
-    return;
+      '<p style="text-align:center; color:#999; font-style: italic; margin: 10px 0;">Сагс хоосон байна.</p>';
+    totalWrapper.style.display = "none";
+    orderForm.style.display = "none";
+  } else {
+    totalWrapper.style.display = "flex";
+    orderForm.style.display = "block";
+    let total = 0;
+    cart.forEach((item, index) => {
+      total += item.price * item.quantity;
+      cartList.innerHTML += `
+                <div class="cart-item-row">
+                    <div class="cart-item-info">
+                        <span class="cart-item-name">${item.name}</span>
+                        <span class="cart-item-price">${item.price.toLocaleString("mn-MN")}₮</span>
+                    </div>
+                    <div class="cart-item-actions">
+                        <button type="button" onclick="changeQty(${index}, -1)">-</button>
+                        <span class="cart-item-qty">${item.quantity}</span>
+                        <button type="button" onclick="changeQty(${index}, 1)">+</button>
+                        <button type="button" class="cart-item-del" onclick="removeFromCart(${index})">❌</button>
+                    </div>
+                </div>
+            `;
+    });
+    totalAmountSpan.innerText = total.toLocaleString("mn-MN") + "₮";
   }
 
-  let total = 0;
-
-  cart.forEach((item, index) => {
-    const itemTotal = item.price * item.quantity;
-    total += itemTotal;
-
-    cartList.innerHTML += `
-            <div class="cart-item-row">
-                <div class="cart-item-info">
-                    <span class="cart-item-name">${item.name}</span>
-                    <span class="cart-item-price">${item.price.toLocaleString("mn-MN")}₮</span>
-                </div>
-                <div class="cart-item-actions">
-                    <button type="button" onclick="changeQty(${index}, -1)">-</button>
-                    <span class="cart-item-qty">${item.quantity}</span>
-                    <button type="button" onclick="changeQty(${index}, 1)">+</button>
-                    <button type="button" class="cart-item-del" onclick="removeFromCart(${index})">❌</button>
-                </div>
-            </div>
-        `;
-  });
-
-  totalAmountSpan.innerText = total.toLocaleString("mn-MN") + "₮";
+  // 2. Тухайн үйлчлүүлэгчийн өгсөн идэвхтэй захиалгын төлөвийг шүүж харуулах
+  renderCustomerOrderStatus();
   document.getElementById("orderModal").style.display = "block";
 }
 
-// 4. ТОО ШИРХЭГ ӨӨРЧЛӨХ (+/-)
+// ҮЙЛЧЛҮҮЛЭГЧИД ӨӨРИЙНХ НЬ ТӨЛӨВИЙГ ХАРУУЛАХ ФУНКЦ
+function renderCustomerOrderStatus() {
+  const statusSection = document.getElementById("myOrdersStatusSection");
+  const customerOrdersList = document.getElementById("customerOrdersList");
+
+  // Өмнө нь оруулсан утас, ширээг санах ойноос авах
+  const currentPhone = localStorage.getItem("last_client_phone");
+  const currentTable = localStorage.getItem("last_client_table");
+  const allOrders = JSON.parse(localStorage.getItem("restaurant_orders")) || [];
+
+  if (!currentPhone || !currentTable) {
+    statusSection.style.display = "none";
+    return;
+  }
+
+  // Зөвхөн энэ үйлчлүүлэгчийн захиалгыг шүүх
+  const myActiveOrders = allOrders.filter(
+    (o) => o.clientPhone === currentPhone && o.tableNumber === currentTable,
+  );
+
+  if (myActiveOrders.length === 0) {
+    statusSection.style.display = "none";
+    return;
+  }
+
+  statusSection.style.display = "block";
+  customerOrdersList.innerHTML = "";
+
+  myActiveOrders.forEach((order) => {
+    let statusClass = "status-pending";
+    if (order.status === "Хийгдэж буй") statusClass = "status-cooking";
+    if (order.status === "Бэлэн болсон") statusClass = "status-ready";
+
+    customerOrdersList.innerHTML += `
+            <div class="customer-status-row">
+                <div class="customer-status-info">
+                    <strong>${order.foodName}</strong> <span style="color:#666;">(${order.quantity}ш)</span>
+                </div>
+                <span class="status-badge ${statusClass}">${order.status}</span>
+            </div>
+        `;
+  });
+}
+
 function changeQty(index, change) {
   cart[index].quantity += change;
   if (cart[index].quantity <= 0) {
@@ -146,7 +179,6 @@ function changeQty(index, change) {
   openCartModal();
 }
 
-// 5. САГСНААС УСТГАХ
 function removeFromCart(index) {
   cart.splice(index, 1);
   saveCart();
@@ -157,20 +189,14 @@ function removeFromCart(index) {
 function saveCart() {
   localStorage.setItem("restaurant_cart", JSON.stringify(cart));
 }
-
 function closeOrderModal() {
   document.getElementById("orderModal").style.display = "none";
-  document.getElementById("orderForm").reset();
 }
 
-// 6. ЗАХИАЛГА БАТАЛГААЖУУЛЖ ORDERS.HTML-Д ХАРАГДУУЛАХ ОГНОО, ШИРЭЭ, ТӨЛӨВТЭЙ ИЛГЭЭХ
+// ЗАХИАЛГА ИЛГЭЭХ
 function submitOrder(event) {
   event.preventDefault();
-
-  if (cart.length === 0) {
-    alert("Сагс хоосон байна!");
-    return;
-  }
+  if (cart.length === 0) return;
 
   const clientTable = document.getElementById("clientTable").value;
   const clientName = document.getElementById("clientName").value;
@@ -181,7 +207,7 @@ function submitOrder(event) {
 
   cart.forEach((item) => {
     orders.push({
-      id: Date.now() + Math.random().toString(36).substr(2, 5), // Өвөрмөц ID
+      id: Date.now() + Math.random().toString(36).substr(2, 5),
       tableNumber: clientTable,
       foodName: item.name,
       foodPrice: item.price.toLocaleString("mn-MN") + "₮",
@@ -189,19 +215,22 @@ function submitOrder(event) {
       clientPhone: clientPhone,
       quantity: item.quantity,
       date: orderDate,
-      status: "Хүлээгдэж буй", // Анхны төлөв
+      status: "Хүлээгдэж буй",
     });
   });
 
   localStorage.setItem("restaurant_orders", JSON.stringify(orders));
 
-  // Сагсыг цэвэрлэх
+  // Үйлчлүүлэгчийг таних мэдээллийг хадгалах
+  localStorage.setItem("last_client_phone", clientPhone);
+  localStorage.setItem("last_client_table", clientTable);
+
   cart = [];
   saveCart();
   updateCartBadge();
 
   alert(
-    `Ширээ ${clientTable} - Захиалга амжилттай бүртгэгдлээ! Төлөвөө orders.html хуудаснаас харна уу.`,
+    `Ширээ ${clientTable} - Захиалга амжилттай илгээгдлээ! Төлөвөө сагс руугаа дахин орж харна уу.`,
   );
-  closeOrderModal();
+  openCartModal(); // Модалыг шинэчилж төлөвийг шууд харуулах
 }
