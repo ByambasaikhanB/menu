@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const { Pool } = require("pg");
 const multer = require("multer");
 const fs = require("fs");
+const path = require("path"); // Хуудасны замуудыг зөв заахад хэрэгтэй
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 
@@ -29,18 +30,23 @@ const upload = multer({ dest: "tmp/" });
 
 // ================= CREATE TABLE =================
 async function initDB() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS menu_items (
-      id SERIAL PRIMARY KEY,
-      image_url TEXT,
-      name TEXT NOT NULL,
-      ingredients TEXT,
-      price TEXT NOT NULL,
-      kcal TEXT,
-      icons TEXT,
-      category TEXT
-    );
-  `);
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS menu_items (
+        id SERIAL PRIMARY KEY,
+        image_url TEXT,
+        name TEXT NOT NULL,
+        ingredients TEXT,
+        price TEXT NOT NULL,
+        kcal TEXT,
+        icons TEXT,
+        category TEXT
+      );
+    `);
+    console.log("Database table checked/initialized successfully.");
+  } catch (err) {
+    console.error("Database initialization error:", err);
+  }
 }
 initDB();
 
@@ -48,19 +54,31 @@ initDB();
 // ================= API ROUTES ====================
 // =================================================
 
-// GET ALL
+// GET ALL (Try-catch нэмж аюулгүй болгов)
 app.get("/menu", async (req, res) => {
-  const result = await pool.query("SELECT * FROM menu_items ORDER BY id DESC");
-  res.json(result.rows);
+  try {
+    const result = await pool.query(
+      "SELECT * FROM menu_items ORDER BY id DESC",
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 // GET BY CATEGORY (CASE INSENSITIVE)
 app.get("/menu/:category", async (req, res) => {
-  const result = await pool.query(
-    "SELECT * FROM menu_items WHERE LOWER(category)=LOWER($1) ORDER BY id DESC",
-    [req.params.category],
-  );
-  res.json(result.rows);
+  try {
+    const result = await pool.query(
+      "SELECT * FROM menu_items WHERE LOWER(category)=LOWER($1) ORDER BY id DESC",
+      [req.params.category],
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 // ADD
@@ -68,9 +86,9 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
   try {
     let { name, ingredients, price, kcal, icons, category } = req.body;
 
-    name = name.toUpperCase();
+    name = name ? name.toUpperCase() : "";
     ingredients = ingredients ? ingredients.toUpperCase() : null;
-    category = category.toLowerCase();
+    category = category ? category.toLowerCase() : "food";
 
     let image_url = null;
 
@@ -84,8 +102,8 @@ app.post("/add-menu", upload.single("image"), async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO menu_items
-       (image_url,name,ingredients,price,kcal,icons,category)
-       VALUES ($1,$2,$3,$4,$5,$6,$7)
+       (image_url, name, ingredients, price, kcal, icons, category)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
       [
         image_url,
@@ -111,9 +129,9 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
     const { id } = req.params;
     let { name, ingredients, price, kcal, icons, category } = req.body;
 
-    name = name.toUpperCase();
+    name = name ? name.toUpperCase() : "";
     ingredients = ingredients ? ingredients.toUpperCase() : null;
-    category = category.toLowerCase();
+    category = category ? category.toLowerCase() : "food";
 
     let image_url = null;
 
@@ -161,12 +179,30 @@ app.put("/menu/:id", upload.single("image"), async (req, res) => {
 
 // DELETE
 app.delete("/menu/:id", async (req, res) => {
-  await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
-  res.json({ success: true });
+  try {
+    await pool.query("DELETE FROM menu_items WHERE id=$1", [req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
 });
 
-// ================= STATIC LAST =================
-app.use(express.static("public"));
+// ================= STATIC FILES & ROUTING =================
+
+// Хэрэв таны HTML файлууд болон style.css, app.js нь public хавтсанд БАЙХГҮЙ,
+// үндсэн хавтас (root) дээр байгаа бол доорх мөрүүдийг ашиглан чиглүүлнэ.
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(__dirname)); // Үндсэн хавтсыг статик болгох (шаардлагатай бол)
+
+// Линкээр шууд хандах үед хуудаснуудыг зөв дуудах замууд
+app.get("/menu-food.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "menu-food.html"));
+});
+
+app.get("/orders.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "orders.html"));
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Server running on port " + PORT));

@@ -1,5 +1,6 @@
 const wrapper = document.getElementById("menu-wrapper");
 
+// Swiper тохиргоо
 const swiper = new Swiper(".testimonial__swiper", {
   loop: false,
   slidesPerView: "auto",
@@ -10,6 +11,10 @@ const swiper = new Swiper(".testimonial__swiper", {
     el: ".swiper-pagination",
     clickable: true,
   },
+  // Swiper-ийн чирэх үйлдэл нь товчлуурын click-ийг хаахаас сэргийлэх тохиргоонууд
+  touchStartPreventDefault: false,
+  preventClicks: true,
+  preventClicksPropagation: true,
 });
 
 async function loadMenu(category) {
@@ -27,6 +32,12 @@ async function loadMenu(category) {
       const icons = item.icons || "";
       const kcal = item.kcal;
 
+      // Үнийг мянгатын таслалтай болгож форматлах (Жишээ нь: 15,000)
+      const formattedPrice = price.toLocaleString("mn-MN") + "₮";
+
+      // Хоолны нэр дотор дан хашилт (') байвал устгах буюу форматлах (JS алдаанаас сэргийлнэ)
+      const safeFoodName = name.replace(/'/g, "\\'");
+
       wrapper.innerHTML += `
         <div class="swiper-slide testimonial__card">
           
@@ -39,7 +50,7 @@ async function loadMenu(category) {
             <div class="testimonial__extra">
 
               <div class="testimonial__price-icons">
-                <span class="testimonial__price">${price}₮</span>
+                <span class="testimonial__price">${formattedPrice}</span>
                 <span class="testimonial__icons">${icons}</span>
               </div>
 
@@ -52,13 +63,21 @@ async function loadMenu(category) {
               }
 
             </div>
+
+            <button class="menu-order-btn" onclick="event.stopPropagation(); openOrderModal('${safeFoodName}', '${formattedPrice}')">
+                Захиалах
+            </button>
+
           </div>
 
         </div>
       `;
     });
 
-    swiper.update();
+    // Дата нэмэгдсэний дараа Swiper-ийг шинэчлэх
+    setTimeout(() => {
+      swiper.update();
+    }, 100);
   } catch (err) {
     console.error("Menu load error:", err);
   }
