@@ -211,6 +211,7 @@ body::before {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   animation: animatetop 0.3s ease-out;
   font-family: var(--body-font);
+  box-sizing: border-box;
 }
 
 @keyframes animatetop {
@@ -233,6 +234,7 @@ body::before {
   font-weight: bold;
   cursor: pointer;
   transition: color 0.2s;
+  line-height: 1;
 }
 
 .close-btn:hover {
@@ -425,8 +427,6 @@ body::before {
 }
 
 /* RESPONSIVE & MOBILE MEDIA QUERIES */
-
-/* Mobile-д desktop шиг card харагдуулах болон Захиалгын хүснэгтийг жагсаалт болгох */
 @media screen and (max-width: 767px) {
   .testimonial__card {
     width: 342px; /* desktop width */
@@ -516,4 +516,153 @@ body::before {
   .testimonial__card {
     width: auto;
   }
+}
+
+/* ================================================================= */
+/* СҮҮЛД НЭМЭГДСЭН САГСНЫ СИСТЕМИЙН ЗАГВАРУУД                         */
+/* ================================================================= */
+
+/* Хөвөгч сагсны товчлуур (Баруун доод буланд байрлана) */
+.floating-cart-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background-color: var(--second-color);
+  color: white;
+  padding: 15px 22px;
+  border-radius: 50px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 9999;
+  font-family: var(--second-font);
+  font-weight: bold;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+}
+
+.floating-cart-btn:hover {
+  transform: scale(1.05);
+  background-color: hsl(18, 88%, 48%);
+}
+
+/* Сагсан дахь хоолны тоог заах дугуй тэмдэг */
+.cart-count-badge {
+  background-color: var(--hotel-brand-color);
+  color: white;
+  min-width: 22px;
+  height: 22px;
+  padding: 2px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-sizing: border-box;
+}
+
+/* Сагсны модал арай өргөн байх тохиргоо */
+.modal-content--cart {
+  max-width: 480px !important;
+}
+
+/* Сагс доторх хоолны мөрүүд */
+.cart-items-list {
+  max-height: 240px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 10px;
+}
+
+.cart-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f9f9f9;
+  gap: 10px;
+}
+
+.cart-item-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  flex: 1;
+}
+
+.cart-item-name {
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.cart-item-price {
+  font-size: 0.85rem;
+  color: var(--second-color);
+  font-weight: 600;
+}
+
+/* Нэмэх, хасах, устгах үйлдлүүд */
+.cart-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cart-item-actions button {
+  background: #f1f1f1;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.cart-item-actions button:hover {
+  background: #ddd;
+}
+
+.cart-item-qty {
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+}
+
+.cart-item-del {
+  background: transparent !important;
+  font-size: 0.9rem !important;
+  padding: 0;
+  margin-left: 5px;
+}
+
+/* Нийт дүн харагдах талбар */
+.cart-total-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--second-font);
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  background: #fffafb;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ffeef1;
+}
+
+.cart-total-amount {
+  color: var(--hotel-brand-color);
 }
