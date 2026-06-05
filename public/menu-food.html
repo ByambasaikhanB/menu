@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Food Menu</title>
+    <title>Grand Hill Hotel - Food Menu</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"
@@ -46,6 +46,16 @@
           </div>
 
           <form id="orderForm" onsubmit="submitOrder(event)">
+            <div class="form-group">
+              <label for="clientTable">Ширээний дугаар:</label>
+              <input
+                type="number"
+                id="clientTable"
+                required
+                placeholder="Жишээ нь: 5"
+                min="1"
+              />
+            </div>
             <div class="form-group">
               <label for="clientName">Таны нэр:</label>
               <input

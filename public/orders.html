@@ -3,83 +3,111 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ирсэн Захиалгууд</title>
+    <title>Захиалгын хянах самбар</title>
     <link rel="stylesheet" href="/style.css" />
   </head>
-  <body>
+  <body style="background: #f4f6f9; padding: 20px">
     <div class="orders-container">
       <div class="header-area">
-        <a href="menu-food.html" class="back-link">← Цэс рүү буцах</a>
-        <h1>Ирсэн Захиалгын Жагсаалт</h1>
-        <button class="clear-btn" id="clearBtn" onclick="clearOrders()">
-          Жагсаалт цэвэрлэх
+        <h1>Ирсэн захиалгууд (Гал тогоо / Админ)</h1>
+        <button class="clear-btn" onclick="clearAllOrders()">
+          Бүх захиалгыг устгах
         </button>
       </div>
 
-      <table id="ordersTable" class="orders-table">
+      <table class="orders-table" id="ordersTable">
         <thead>
           <tr>
-            <th style="width: 50px">№</th>
+            <th>№</th>
+            <th>Ширээ</th>
             <th>Огноо</th>
             <th>Үйлчлүүлэгч</th>
-            <th>Утасны дугаар</th>
-            <th>Хоолны нэр</th>
-            <th>Нэгж үнэ</th>
-            <th>Тоо ширхэг</th>
+            <th>Утас</th>
+            <th>Хоол</th>
+            <th>Тоо</th>
+            <th>Үнэ</th>
+            <th>Төлөв</th>
+            <th>Үйлдэл</th>
           </tr>
         </thead>
         <tbody id="ordersBody"></tbody>
       </table>
       <div id="noOrdersMessage" class="no-orders" style="display: none">
-        Одоогоор ирсэн захиалга байхгүй байна.
+        Одоогоор захиалга байхгүй байна.
       </div>
     </div>
 
     <script>
-      function displayOrders() {
-        const ordersBody = document.getElementById("ordersBody");
-        const noOrdersMessage = document.getElementById("noOrdersMessage");
-        const ordersTable = document.getElementById("ordersTable");
-        const clearBtn = document.getElementById("clearBtn");
-
-        let orders =
+      function renderOrders() {
+        const orders =
           JSON.parse(localStorage.getItem("restaurant_orders")) || [];
-        ordersBody.innerHTML = "";
+        const tbody = document.getElementById("ordersBody");
+        const noOrdersMsg = document.getElementById("noOrdersMessage");
+        const table = document.getElementById("ordersTable");
+
+        tbody.innerHTML = "";
 
         if (orders.length === 0) {
-          noOrdersMessage.style.display = "block";
-          ordersTable.style.display = "none";
-          clearBtn.style.display = "none";
+          table.style.display = "none";
+          noOrdersMsg.style.display = "block";
           return;
         }
 
-        noOrdersMessage.style.display = "none";
-        ordersTable.style.display = "table";
-        clearBtn.style.display = "block";
+        table.style.display = "table";
+        noOrdersMsg.style.display = "none";
 
-        orders.reverse().forEach((order, index) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td><b>${index + 1}</b></td>
-            <td>${order.date}</td>
-            <td>${order.clientName}</td>
-            <td><a href="tel:${order.clientPhone}" class="order-phone-link">${order.clientPhone}</a></td>
-            <td style="font-weight: 600;">${order.foodName}</td>
-            <td>${order.foodPrice}</td>
-            <td><span class="order-qty-badge">${order.quantity} ш</span></td>
-        `;
-          ordersBody.appendChild(row);
+        orders.forEach((order, index) => {
+          // Төлөвөөс хамаарч өөр өнгөтэй CSS класс оноох
+          let statusClass = "status-pending";
+          if (order.status === "Хийгдэж буй") statusClass = "status-cooking";
+          if (order.status === "Бэлэн болсон") statusClass = "status-ready";
+
+          tbody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><strong style="font-size:1.2rem; color:#531723;">${order.tableNumber || "-"}</strong></td>
+                    <td style="font-size: 0.8rem; color: #666;">${order.date}</td>
+                    <td>${order.clientName}</td>
+                    <td><a class="order-phone-link" href="tel:${order.clientPhone}">${order.clientPhone}</a></td>
+                    <td><strong>${order.foodName}</strong></td>
+                    <td><span class="order-qty-badge">${order.quantity}</span></td>
+                    <td>${order.foodPrice}</td>
+                    <td><span class="status-badge ${statusClass}">${order.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-status-cook" onclick="updateStatus('${order.id}', 'Хийгдэж буй')">Хийх 👨‍🍳</button>
+                            <button class="btn-status-ready" onclick="updateStatus('${order.id}', 'Бэлэн болсон')">Бэлэн ✅</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
         });
       }
 
-      function clearOrders() {
-        if (confirm("Та бүх захиалгыг устгахдаа итгэлтэй байна уу?")) {
+      // ТӨЛӨВ ШИНЭЧЛЭХ ФУНКЦ
+      function updateStatus(orderId, newStatus) {
+        let orders =
+          JSON.parse(localStorage.getItem("restaurant_orders")) || [];
+
+        orders = orders.map((order) => {
+          if (order.id === orderId) {
+            order.status = newStatus;
+          }
+          return order;
+        });
+
+        localStorage.setItem("restaurant_orders", JSON.stringify(orders));
+        renderOrders();
+      }
+
+      function clearAllOrders() {
+        if (confirm("Бүх захиалгыг устгахдаа итгэлтэй байна уу?")) {
           localStorage.removeItem("restaurant_orders");
-          displayOrders();
+          renderOrders();
         }
       }
 
-      window.onload = displayOrders;
+      window.onload = renderOrders;
     </script>
   </body>
 </html>

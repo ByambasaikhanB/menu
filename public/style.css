@@ -66,8 +66,8 @@ body::before {
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
   cursor: pointer;
-  display: inline-block; /* original image size */
-  width: 342px; /* desktop width */
+  display: inline-block;
+  width: 342px;
 }
 
 .testimonial__card:hover {
@@ -76,8 +76,8 @@ body::before {
 
 .testimonial__img {
   display: block;
-  width: 342px; /* desktop width */
-  height: 500px; /* desktop height */
+  width: 342px;
+  height: 500px;
   object-fit: cover;
 }
 
@@ -87,14 +87,9 @@ body::before {
   bottom: 0;
   left: 0;
   width: 100%;
-  background: rgba(
-    0,
-    0,
-    0,
-    0.7
-  ); /* Текстийг илүү тод харагдуулах үүднээс бага зэрэг бараан болгов */
+  background: rgba(0, 0, 0, 0.7);
   color: #fff;
-  padding: 16px 12px 12px 12px; /* Товчлуур багтах зай авсан */
+  padding: 16px 12px 12px 12px;
   box-sizing: border-box;
   font-family: var(--second-font);
 }
@@ -113,7 +108,7 @@ body::before {
 /* Price + icons мөр */
 .testimonial__extra {
   display: flex;
-  justify-content: space-between; /* зүүн талд price+icons, баруун талд kcal */
+  justify-content: space-between;
   align-items: center;
   margin-top: 8px;
 }
@@ -121,7 +116,7 @@ body::before {
 .testimonial__price-icons {
   display: flex;
   align-items: center;
-  gap: 6px; /* price ба icons хооронд зай */
+  gap: 6px;
 }
 
 .testimonial__price {
@@ -133,7 +128,7 @@ body::before {
 .testimonial__icons {
   font-size: 1.5rem;
   display: flex;
-  gap: 4px; /* icons хооронд зай */
+  gap: 4px;
 }
 
 .testimonial__kcal {
@@ -143,9 +138,7 @@ body::before {
 
 /* КАРТ ДЭЭРХ ЗАХИАЛАХ ТОВЧЛУУР */
 .menu-order-btn {
-  background-color: var(
-    --second-color
-  ); /* Вэбийн үндсэн тод улбар шар өнгөөр уусгав */
+  background-color: var(--second-color);
   color: white;
   border: none;
   padding: 10px 16px;
@@ -250,21 +243,6 @@ body::before {
   font-size: 1.3rem;
 }
 
-.modal-food-name {
-  font-family: var(--second-font);
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: var(--hotel-brand-color);
-  margin: 15px 0 5px 0;
-}
-
-.modal-food-price {
-  color: var(--second-color);
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0 0 20px 0;
-}
-
 .form-group {
   margin-bottom: 16px;
   text-align: left;
@@ -341,20 +319,6 @@ body::before {
   font-size: 1.8rem;
 }
 
-.back-link {
-  color: var(--hotel-brand-color);
-  text-decoration: none;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--body-font);
-}
-
-.back-link:hover {
-  text-decoration: underline;
-}
-
 .orders-table {
   width: 100%;
   border-collapse: collapse;
@@ -387,10 +351,6 @@ body::before {
 .order-phone-link {
   color: #007bff;
   text-decoration: none;
-}
-
-.order-phone-link:hover {
-  text-decoration: underline;
 }
 
 .order-qty-badge {
@@ -426,19 +386,16 @@ body::before {
   background-color: #bd2130;
 }
 
-/* RESPONSIVE & MOBILE MEDIA QUERIES */
+/* RESPONSIVE & MOBILE */
 @media screen and (max-width: 767px) {
   .testimonial__card {
-    width: 342px; /* desktop width */
-    display: inline-block; /* inline-block хэвээр */
+    width: 342px;
+    display: inline-block;
   }
-
   .testimonial__img {
     width: 342px;
     height: 500px;
   }
-
-  /* Orders.html-ийн гар утасны зохицуулалт */
   .orders-container {
     margin: 15px;
     padding: 15px;
@@ -448,6 +405,7 @@ body::before {
     align-items: flex-start;
     gap: 15px;
   }
+
   .orders-table,
   .orders-table thead,
   .orders-table tbody,
@@ -492,26 +450,34 @@ body::before {
     content: "№";
   }
   .orders-table td:nth-of-type(2):before {
-    content: "Огноо";
+    content: "Ширээ";
   }
   .orders-table td:nth-of-type(3):before {
-    content: "Үйлчлүүлэгч";
+    content: "Огноо";
   }
   .orders-table td:nth-of-type(4):before {
-    content: "Утас";
+    content: "Үйлчлүүлэгч";
   }
   .orders-table td:nth-of-type(5):before {
-    content: "Хоол";
+    content: "Утас";
   }
   .orders-table td:nth-of-type(6):before {
-    content: "Үнэ";
+    content: "Хоол";
   }
   .orders-table td:nth-of-type(7):before {
     content: "Тоо ширхэг";
   }
+  .orders-table td:nth-of-type(8):before {
+    content: "Үнэ";
+  }
+  .orders-table td:nth-of-type(9):before {
+    content: "Төлөв";
+  }
+  .orders-table td:nth-of-type(10):before {
+    content: "Үйлдэл";
+  }
 }
 
-/* Tablet болон desktop хэвээр */
 @media screen and (min-width: 768px) {
   .testimonial__card {
     width: auto;
@@ -519,10 +485,8 @@ body::before {
 }
 
 /* ================================================================= */
-/* СҮҮЛД НЭМЭГДСЭН САГСНЫ СИСТЕМИЙН ЗАГВАРУУД                         */
+/* САГСНЫ СИСТЕМ БОЛОН АДМИН ТӨЛӨВИЙН ЗАГВАРУУД                       */
 /* ================================================================= */
-
-/* Хөвөгч сагсны товчлуур (Баруун доод буланд байрлана) */
 .floating-cart-btn {
   position: fixed;
   bottom: 25px;
@@ -544,13 +508,11 @@ body::before {
     transform 0.2s,
     background-color 0.2s;
 }
-
 .floating-cart-btn:hover {
   transform: scale(1.05);
   background-color: hsl(18, 88%, 48%);
 }
 
-/* Сагсан дахь хоолны тоог заах дугуй тэмдэг */
 .cart-count-badge {
   background-color: var(--hotel-brand-color);
   color: white;
@@ -566,12 +528,9 @@ body::before {
   box-sizing: border-box;
 }
 
-/* Сагсны модал арай өргөн байх тохиргоо */
 .modal-content--cart {
   max-width: 480px !important;
 }
-
-/* Сагс доторх хоолны мөрүүд */
 .cart-items-list {
   max-height: 240px;
   overflow-y: auto;
@@ -579,7 +538,6 @@ body::before {
   border-bottom: 1px dashed #eee;
   padding-bottom: 10px;
 }
-
 .cart-item-row {
   display: flex;
   justify-content: space-between;
@@ -588,34 +546,29 @@ body::before {
   border-bottom: 1px solid #f9f9f9;
   gap: 10px;
 }
-
 .cart-item-info {
   display: flex;
   flex-direction: column;
   text-align: left;
   flex: 1;
 }
-
 .cart-item-name {
   font-weight: bold;
   font-size: 0.95rem;
   color: #333;
 }
-
 .cart-item-price {
   font-size: 0.85rem;
   color: var(--second-color);
   font-weight: 600;
 }
 
-/* Нэмэх, хасах, устгах үйлдлүүд */
 .cart-item-actions {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
 }
-
 .cart-item-actions button {
   background: #f1f1f1;
   border: none;
@@ -630,17 +583,14 @@ body::before {
   justify-content: center;
   padding: 0;
 }
-
 .cart-item-actions button:hover {
   background: #ddd;
 }
-
 .cart-item-qty {
   font-weight: bold;
   min-width: 20px;
   text-align: center;
 }
-
 .cart-item-del {
   background: transparent !important;
   font-size: 0.9rem !important;
@@ -648,7 +598,6 @@ body::before {
   margin-left: 5px;
 }
 
-/* Нийт дүн харагдах талбар */
 .cart-total-area {
   display: flex;
   justify-content: space-between;
@@ -662,7 +611,63 @@ body::before {
   border-radius: 6px;
   border: 1px solid #ffeef1;
 }
-
 .cart-total-amount {
   color: var(--hotel-brand-color);
+}
+
+/* Төлөв заах тэмдэгүүд (Badges) */
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  display: inline-block;
+  text-align: center;
+}
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+.status-cooking {
+  background-color: #cce5ff;
+  color: #004085;
+  border: 1px solid #b8daff;
+}
+.status-ready {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+/* Админ товчлуурууд */
+.action-buttons {
+  display: flex;
+  gap: 5px;
+}
+.action-buttons button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  color: white;
+  font-family: var(--body-font);
+}
+.action-buttons button:hover {
+  opacity: 0.9;
+}
+.btn-status-cook {
+  background-color: #007bff;
+}
+.btn-status-ready {
+  background-color: #28a745;
+}
+
+@media screen and (max-width: 767px) {
+  .action-buttons {
+    justify-content: flex-end;
+  }
 }

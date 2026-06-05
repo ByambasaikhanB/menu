@@ -74,7 +74,6 @@ async function loadMenu(category) {
 
 // 1. САГСАНД ХООЛ НЭМЭХ ФУНКЦ
 function addToCart(foodName, foodPrice) {
-  // Сагсанд өмнө нь нэмэгдсэн эсэхийг шалгах
   const existingItem = cart.find((item) => item.name === foodName);
 
   if (existingItem) {
@@ -85,8 +84,6 @@ function addToCart(foodName, foodPrice) {
 
   saveCart();
   updateCartBadge();
-
-  // Хэрэглэгчид мэдэгдэл харуулах (Заавал alert биш жижиг эффект оруулж болно)
   alert(`${foodName} сагсанд нэмэгдлээ!`);
 }
 
@@ -106,7 +103,7 @@ function openCartModal() {
 
   if (cart.length === 0) {
     cartList.innerHTML =
-      '<p style="text-align:center; color:#999; italic">Сагс хоосон байна.</p>';
+      '<p style="text-align:center; color:#999; font-style: italic;">Сагс хоосон байна.</p>';
     totalAmountSpan.innerText = "0₮";
     document.getElementById("orderModal").style.display = "block";
     return;
@@ -146,7 +143,7 @@ function changeQty(index, change) {
   }
   saveCart();
   updateCartBadge();
-  openCartModal(); // Сагсыг дахин шинэчилж зурах
+  openCartModal();
 }
 
 // 5. САГСНААС УСТГАХ
@@ -166,7 +163,7 @@ function closeOrderModal() {
   document.getElementById("orderForm").reset();
 }
 
-// 6. ЗАХИАЛГА БАТАЛГААЖУУЛЖ ORDERS.HTML РҮҮ ЯВУУЛАХ
+// 6. ЗАХИАЛГА БАТАЛГААЖУУЛЖ ORDERS.HTML-Д ХАРАГДУУЛАХ ОГНОО, ШИРЭЭ, ТӨЛӨВТЭЙ ИЛГЭЭХ
 function submitOrder(event) {
   event.preventDefault();
 
@@ -175,21 +172,24 @@ function submitOrder(event) {
     return;
   }
 
+  const clientTable = document.getElementById("clientTable").value;
   const clientName = document.getElementById("clientName").value;
   const clientPhone = document.getElementById("clientPhone").value;
   const orderDate = new Date().toLocaleString("mn-MN");
 
   let orders = JSON.parse(localStorage.getItem("restaurant_orders")) || [];
 
-  // Сагсанд байгаа бүх хоолыг нэг нэгээр нь захиалгын жагсаалт руу шилжүүлэх
   cart.forEach((item) => {
     orders.push({
+      id: Date.now() + Math.random().toString(36).substr(2, 5), // Өвөрмөц ID
+      tableNumber: clientTable,
       foodName: item.name,
       foodPrice: item.price.toLocaleString("mn-MN") + "₮",
       clientName: clientName,
       clientPhone: clientPhone,
       quantity: item.quantity,
       date: orderDate,
+      status: "Хүлээгдэж буй", // Анхны төлөв
     });
   });
 
@@ -200,6 +200,8 @@ function submitOrder(event) {
   saveCart();
   updateCartBadge();
 
-  alert("Захиалга амжилттай бүртгэгдлээ!");
+  alert(
+    `Ширээ ${clientTable} - Захиалга амжилттай бүртгэгдлээ! Төлөвөө orders.html хуудаснаас харна уу.`,
+  );
   closeOrderModal();
 }
