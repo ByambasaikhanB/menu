@@ -11,7 +11,7 @@
       <div class="header-area">
         <h1>Ирсэн захиалгууд (Гал тогоо / Админ Самбар)</h1>
         <button class="clear-btn" onclick="clearAllOrders()">
-          Бүх захиалгыг устгах
+          Бүх захиалгыг ustgah
         </button>
       </div>
 
@@ -20,8 +20,7 @@
           <tr>
             <th>№</th>
             <th>Ширээ</th>
-            <th>Огноо</th>
-            <th>Үйлчлүүлэгч</th>
+            <th>Захиалсан цаг</th>
             <th>Утас</th>
             <th>Хоол</th>
             <th>Тоо</th>
@@ -30,7 +29,9 @@
             <th>Үйлдэл</th>
           </tr>
         </thead>
-        <tbody id="ordersBody"></tbody>
+        <tbody id="ordersBody">
+          <!-- Захиалгууд JS-ээр зурагдана -->
+        </tbody>
       </table>
       <div id="noOrdersMessage" class="no-orders" style="display: none">
         Одоогоор ирсэн захиалга байхгүй байна.
@@ -64,9 +65,8 @@
           tbody.innerHTML += `
                 <tr>
                     <td>${index + 1}</td>
-                    <td><strong style="font-size:1.2rem; color:#531723;">${order.tableNumber || "-"}</strong></td>
-                    <td style="font-size: 0.8rem; color: #666;">${order.date}</td>
-                    <td>${order.clientName}</td>
+                    <td><strong style="font-size:1.3rem; color:#531723;">${order.tableNumber || "-"}</strong></td>
+                    <td><span style="font-weight: 600; color: #e65c00;">🕒 ${order.date}</span></td>
                     <td><a class="order-phone-link" href="tel:${order.clientPhone}">${order.clientPhone}</a></td>
                     <td><strong>${order.foodName}</strong></td>
                     <td><span class="order-qty-badge">${order.quantity}</span></td>

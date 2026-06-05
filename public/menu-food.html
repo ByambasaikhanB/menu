@@ -12,6 +12,7 @@
   </head>
 
   <body>
+    <!-- Логоны хэсэг -->
     <div id="nav-img">
       <img
         src="/images/573042711_1257512113060075_5532132655197880755_n.jpg"
@@ -19,6 +20,7 @@
       />
     </div>
 
+    <!-- Хоолны цэс (Swiper Slider) -->
     <section class="testimonial container">
       <h2 class="testimonial__title">Food Menu</h2>
       <div class="testimonial__swiper swiper">
@@ -27,24 +29,29 @@
       </div>
     </section>
 
+    <!-- ХӨВӨГЧ САГСНЫ ТОВЧЛУУР -->
     <div class="floating-cart-btn" onclick="openCartModal()">
       <span>🛒 Сагс & Төлөв</span>
       <span id="cartCountBadge" class="cart-count-badge">0</span>
     </div>
 
+    <!-- ЗАХИАЛГА ХИЙХ БОЛОН ТӨЛӨВ ХАРАХ ХАМТАТГАСАН МОДАЛ -->
     <div id="orderModal" class="custom-modal">
       <div class="modal-content modal-content--cart">
         <span class="close-btn" onclick="closeOrderModal()">&times;</span>
         <h2 class="modal-title">Миний Сагс</h2>
 
         <div class="modal-body">
+          <!-- Сагсан дахь хоолнуудын жагсаалт -->
           <div id="cartItemsList" class="cart-items-list"></div>
 
+          <!-- Нийт үнийн дүн -->
           <div id="cartTotalWrapper" class="cart-total-area">
             <span>Нийт дүн:</span>
             <span id="cartTotalAmount" class="cart-total-amount">0₮</span>
           </div>
 
+          <!-- Ширээний дугаар болон Утас авах форм (Нэрийг хассан) -->
           <form id="orderForm" onsubmit="submitOrder(event)">
             <div class="form-group">
               <label for="clientTable">Ширээний дугаар:</label>
@@ -54,15 +61,6 @@
                 required
                 placeholder="Жишээ нь: 5"
                 min="1"
-              />
-            </div>
-            <div class="form-group">
-              <label for="clientName">Таны нэр:</label>
-              <input
-                type="text"
-                id="clientName"
-                required
-                placeholder="Нэрээ оруулна уу"
               />
             </div>
             <div class="form-group">
@@ -79,6 +77,7 @@
             </button>
           </form>
 
+          <!-- ҮЙЛЧЛҮҮЛЭГЧИД ӨӨРИЙНХ НЬ ЗАХИАЛГЫН ТӨЛӨВ ХАРАГДАХ ХЭСЭГ (Цагтай) -->
           <div
             id="myOrdersStatusSection"
             class="customer-status-section"

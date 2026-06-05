@@ -82,14 +82,13 @@ function updateCartBadge() {
   badge.innerText = totalItems;
 }
 
-// САГСНЫ МОДАЛ НЭЭХ БОЛОН ТӨЛӨВ ХАРАГДУУЛАХ ХЭСЭГ
+// САГСНЫ МОДАЛ НЭЭХ
 function openCartModal() {
   const cartList = document.getElementById("cartItemsList");
   const totalAmountSpan = document.getElementById("cartTotalAmount");
   const totalWrapper = document.getElementById("cartTotalWrapper");
   const orderForm = document.getElementById("orderForm");
 
-  // 1. Сагсанд байгаа хоолыг зурах
   cartList.innerHTML = "";
   if (cart.length === 0) {
     cartList.innerHTML =
@@ -120,17 +119,15 @@ function openCartModal() {
     totalAmountSpan.innerText = total.toLocaleString("mn-MN") + "₮";
   }
 
-  // 2. Тухайн үйлчлүүлэгчийн өгсөн идэвхтэй захиалгын төлөвийг шүүж харуулах
   renderCustomerOrderStatus();
   document.getElementById("orderModal").style.display = "block";
 }
 
-// ҮЙЛЧЛҮҮЛЭГЧИД ӨӨРИЙНХ НЬ ТӨЛӨВИЙГ ХАРУУЛАХ ФУНКЦ
+// ҮЙЛЧЛҮҮЛЭГЧИД ӨӨРИЙНХ НЬ ТӨЛӨВИЙГ ЦАГТАЙ ХАРУУЛАХ
 function renderCustomerOrderStatus() {
   const statusSection = document.getElementById("myOrdersStatusSection");
   const customerOrdersList = document.getElementById("customerOrdersList");
 
-  // Өмнө нь оруулсан утас, ширээг санах ойноос авах
   const currentPhone = localStorage.getItem("last_client_phone");
   const currentTable = localStorage.getItem("last_client_table");
   const allOrders = JSON.parse(localStorage.getItem("restaurant_orders")) || [];
@@ -140,7 +137,6 @@ function renderCustomerOrderStatus() {
     return;
   }
 
-  // Зөвхөн энэ үйлчлүүлэгчийн захиалгыг шүүх
   const myActiveOrders = allOrders.filter(
     (o) => o.clientPhone === currentPhone && o.tableNumber === currentTable,
   );
@@ -162,6 +158,7 @@ function renderCustomerOrderStatus() {
             <div class="customer-status-row">
                 <div class="customer-status-info">
                     <strong>${order.foodName}</strong> <span style="color:#666;">(${order.quantity}ш)</span>
+                    <div style="font-size:0.75rem; color:#888; margin-top:2px;">🕒 Захиалсан: ${order.date}</div>
                 </div>
                 <span class="status-badge ${statusClass}">${order.status}</span>
             </div>
@@ -193,15 +190,20 @@ function closeOrderModal() {
   document.getElementById("orderModal").style.display = "none";
 }
 
-// ЗАХИАЛГА ИЛГЭЭХ
+// ЗАХИАЛГА ИЛГЭЭХ (Нэрийг хассан)
 function submitOrder(event) {
   event.preventDefault();
   if (cart.length === 0) return;
 
   const clientTable = document.getElementById("clientTable").value;
-  const clientName = document.getElementById("clientName").value;
   const clientPhone = document.getElementById("clientPhone").value;
-  const orderDate = new Date().toLocaleString("mn-MN");
+
+  // Огноог арай богино бөгөөд тодорхой формат руу шилжүүлэх (Жишээ нь: 14:35)
+  const now = new Date();
+  const orderDate = now.toLocaleTimeString("mn-MN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   let orders = JSON.parse(localStorage.getItem("restaurant_orders")) || [];
 
@@ -211,7 +213,6 @@ function submitOrder(event) {
       tableNumber: clientTable,
       foodName: item.name,
       foodPrice: item.price.toLocaleString("mn-MN") + "₮",
-      clientName: clientName,
       clientPhone: clientPhone,
       quantity: item.quantity,
       date: orderDate,
@@ -221,7 +222,6 @@ function submitOrder(event) {
 
   localStorage.setItem("restaurant_orders", JSON.stringify(orders));
 
-  // Үйлчлүүлэгчийг таних мэдээллийг хадгалах
   localStorage.setItem("last_client_phone", clientPhone);
   localStorage.setItem("last_client_table", clientTable);
 
@@ -229,8 +229,6 @@ function submitOrder(event) {
   saveCart();
   updateCartBadge();
 
-  alert(
-    `Ширээ ${clientTable} - Захиалга амжилттай илгээгдлээ! Төлөвөө сагс руугаа дахин орж харна уу.`,
-  );
-  openCartModal(); // Модалыг шинэчилж төлөвийг шууд харуулах
+  alert(`Ширээ ${clientTable} - Захиалга амжилттай илгээгдлээ!`);
+  openCartModal();
 }
